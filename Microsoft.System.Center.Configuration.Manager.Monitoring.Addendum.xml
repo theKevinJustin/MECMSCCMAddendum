@@ -3722,7 +3722,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
 				</RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3738,7 +3738,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3754,7 +3754,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3770,7 +3770,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3786,7 +3786,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3802,7 +3802,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3818,7 +3818,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3834,7 +3834,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3850,7 +3850,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3866,7 +3866,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3882,7 +3882,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3898,7 +3898,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3914,7 +3914,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3930,7 +3930,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3946,7 +3946,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     </HostProperty>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGE[EW][AEK][M02]-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServerNamingConvention##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -3976,7 +3976,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                         </HostProperty>
                       </ValueExpression>
                       <Operator>MatchesRegularExpression</Operator>
-                      <Pattern>(?i)EK2-SCCM03|K2-SCCM1[01]</Pattern>
+                      <Pattern>(?i)##MECMServerNameDiskSpecific##</Pattern>
                     </RegExExpression>
                   </Expression>
                   <Expression>
@@ -4005,7 +4005,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                         </HostProperty>
                       </ValueExpression>
                       <Operator>MatchesRegularExpression</Operator>
-                      <Pattern>(?i)EK2-SCCM03|K2-SCCM1[01]</Pattern>
+                      <Pattern>(?i)##MECMServerNameDiskSpecific##</Pattern>
                     </RegExExpression>
                   </Expression>
                   <Expression>
@@ -4041,7 +4041,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     <Property>$MPElement[Name="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Property>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NG[a-z]|A[a-z][a-z]|D[NJS][EMR]</Pattern>
+                  <Pattern>(?i)##MECMAllManagedClientServersNamingConventions##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
@@ -4066,7 +4066,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                     <Property>$MPElement[Name="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Property>
                   </ValueExpression>
                   <Operator>MatchesRegularExpression</Operator>
-                  <Pattern>(?i)NGEEA0-SCCM|NGEWA0-SCCM|NGEEK2-SCCM|NGNBA0-SCCM|D[NJS][EMR]JJ0[1-6]S</Pattern>
+                  <Pattern>(?i)##MECMServersNamingConventions##</Pattern>
                 </RegExExpression>
               </Expression>
             </MembershipRule>
