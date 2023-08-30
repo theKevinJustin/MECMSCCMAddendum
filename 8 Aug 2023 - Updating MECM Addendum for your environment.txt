@@ -1,0 +1,150 @@
+#=============================================================
+# MECM Addendum has to be updated for MECM servers
+#=============================================================
+
+
+
+#=============================================================
+# Need to update for the DS and WA report tasks
+#=============================================================
+
+Examples below are for two strings, assuming possibilities for different roles
+	String1 = ##MECMServerType##* = string*
+	String2 = *##MECMServerType2##* = *string*
+
+NOTE: Depending on the server naming convention asterisk (*) may need to go on both sides of the expression
+
+#=============================================================
+# Example expressions (three sets of server names)
+#=============================================================
+$MECMServerAlerts = $MECMReportAlerts | ? { ( $_.NetBiosComputerName -like "##MECMServerType##*" ) `
+	-OR ( $_.NetBiosComputerName -like "*##MECMServerType2##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "##MECMServerType##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*##MECMServerType2##*" ) `
+	}
+
+  $MM = ($Instance | ? { $_.InMaintenanceMode -eq "True" }).DisplayName `
+	| ? { ( $_.DisplayName -like "##MECMServerType##*" ) `
+	-OR ( $_.DisplayName -like "D*##MECMServerType2##*" ) `
+	}
+
+
+#  $UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).DisplayName `
+$UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).DisplayName `
+	| ? { ( $_.DisplayName -like "##MECMServerType##*" ) `
+	-OR ( $_.DisplayName -like "*##MECMServerType2##*" ) `
+	}
+
+$DownAgents = get-SCOMAlert | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
+	-OR ( $_.Name -eq "Failed to Connect to Computer" ) `
+	-OR ( $_.Name -eq "System Center Management Health Service Unloaded System Rule(s)") `
+	-OR ( $_.Name -eq "System Center Management Health Service Unable to Process New Configuration" ) `
+	}   | ? { $_.ResolutionState -ne "255"} `
+	| ? { ( $_.NetBiosComputerName -like "##MECMServerType##*" ) `
+	-OR ( $_.NetBiosComputerName -like "D*##MECMServerType2##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "##MECMServerType##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "D*##MECMServerType2##*" ) `
+	}
+
+$LDSTest = get-scomalert -name "Logical disk Free space is low" | ? { ( $_.NetbiosComputerName -like "##MECMServerType##*" ) `
+	-OR ( $_.NetbiosComputerName -like "D*##MECMServerType2##*" ) `
+	}
+
+$MECMPKIexpired = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
+  	# PKI certs can have Certstore, but it's not always searchable/display capable
+	#} | ? { $_.CertStore -like "Intermediate Certification*" `
+	} | ? { ( $_.Path -like "##MECMServerType##*" ) `
+	-OR ( $_.Path -like "D*##MECMServerType2##*" ) `
+	} # | ft Path,Values -auto -wrap  # DisplayName
+	
+  $MECMPKIexpired.count
+
+$MECMPKIpersonal = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
+	} | ? { ( $_.CertStore -eq "Personal" ) `
+	} | ? { ( $_.Path -like "##MECMServerType##*" ) `
+	-OR ( $_.Path -like "D*##MECMServerType2##*" ) `
+	} # | ft Path,Values -auto -wrap  # DisplayName
+
+  $MECMPKIpersonal.count
+
+# Intermediate Cert Check
+	# PKI certs can have Certstore, but it's not always searchable/display capable
+	#} | ? { $_.CertStore -like "Intermediate Certification*" `
+
+$MECMIntermediate = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
+	} | ? { $_.CertStore -like "Intermediate Certification*" `
+	} | ? { ( $_.Path -like "##MECMServerType##*" ) `
+	-OR ( $_.Path -like "D*##MECMServerType2##*" ) `
+	} # | ft Path,Values -auto -wrap  # DisplayName
+
+$MECMRootCerts = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
+	} | ? { $_.CertStore -like "Root" `
+	} | ? { ( $_.Path -like "##MECMServerType##*" ) `
+	-OR ( $_.Path -like "D*##MECMServerType2##*" ) `
+	} # | ft Path,Values -auto -wrap  # DisplayName
+
+
+
+#=============================================================
+# Discovery Patterns
+#=============================================================
+ <Pattern>(?i)##MECMServerType##|##MECMServerType2##</Pattern>
+
+H: 500GB
+<Pattern>(?i)##MECMServerType##|##MECMServerType2##</Pattern>
+<Pattern>(?i)H:</Pattern>
+
+
+
+#=============================================================
+# Determine regular expressions for environment
+#=============================================================
+[11:32 AM] Justin, Kevin W CTR NG NGB (USA)
+and for the 2012 containing b7001
+are they similarly named for the role ?
+[11:34 AM] Fuhriman, Adam M CTR USARMY RCC-C (USA)
+SS = Site server for Secondary, PM= Management point, PD= Primary Database. The second letter notates what the server does.
+
+
+( $_.NetBiosComputerName -like "*w054aacs*" ) `
+	-OR ( $_.NetBiosComputerName -like "*w054aadp*" ) `
+	-OR ( $_.NetBiosComputerName -like "*w054aard*" ) `
+	-OR ( $_.NetBiosComputerName -like "*b7001PD*" ) `
+	-OR ( $_.NetBiosComputerName -like "*b7001PM*" ) `
+	-OR ( $_.NetBiosComputerName -like "*b7001SS*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*w054aacs*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*w054aadp*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*w054aard*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*b7001PD*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*b7001PM*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*b7001SS*" ) `
+
+( $_.DisplayName -like "*w054aacs*" ) `
+	-OR ( $_.DisplayName -like "*w054aadp*" ) `
+	-OR ( $_.DisplayName -like "*w054aard*" ) `
+	-OR ( $_.DisplayName -like "*b7001PD*" ) `
+	-OR ( $_.DisplayName -like "*b7001PM*" ) `
+	-OR ( $_.DisplayName -like "*b7001SS*" ) `
+
+( $_.Path -like "*w054aacs*" ) `
+	-OR ( $_.Path -like "*w054aadp*" ) `
+	-OR ( $_.Path -like "*w054aard*" ) `
+	-OR ( $_.DisplayName -like "*b7001PD*" ) `
+	-OR ( $_.DisplayName -like "*b7001PM*" ) `
+	-OR ( $_.DisplayName -like "*b7001SS*" ) `
+
+Group updates
+<Pattern>(?i)##MECMServerType##|##MECMServerType2##</Pattern>
+
+(?i)w054aacs|w054aadp|w054aard|b7001PD|b7001PM|b7001SS
+
+
+
+
+# Verify Context Instances
+#=============================================================
+Search for ContextInstance=
+
+Example
+ContextInstance="c744e323-eec9-7702-8380-cd1103b6b620"
+
