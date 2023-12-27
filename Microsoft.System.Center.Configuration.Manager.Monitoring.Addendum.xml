@@ -2,7 +2,7 @@
   <Manifest>
     <Identity>
       <ID>Microsoft.System.Center.Configuration.Manager.Monitoring.Addendum</ID>
-      <Version>1.0.2.5</Version>
+      <Version>1.0.2.8</Version>
     </Identity>
     <Name>Microsoft System Center 2012 Configuration Manager Monitoring Addendum</Name>
     <References>
@@ -115,7 +115,7 @@
 				</Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1025.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1028.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  SCCM MECM Client cache cleanup and C: drive cleanup
@@ -137,8 +137,8 @@ $ComputerName = $env:ComputerName
 
 # Constants section - modify stuff here:
 #=================================================================================
-# Assign script name variable for use in event logging.  
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1025.ps1"
+# Assign script name variable for use in event logging.
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1028.ps1"
 $EventID = "680"
 #=================================================================================
 
@@ -155,19 +155,19 @@ $momapi = New-Object -comObject MOM.ScriptAPI
 $bag = $momapi.CreatePropertyBag()
 
 #Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
 #=================================================================================
 
 
 # Begin MAIN script section
 #=================================================================================
 #Log script parameters we received
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`nScript parameters passed into datasource: `nDriveLetter: ($DriveLetter). `nComputerName: ($ComputerName).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script parameters passed into datasource: `nDriveLetter: ($DriveLetter). `nComputerName: ($ComputerName).")
 
 #For a simple example - get files in Windows Temp:
 $date = get-date -uFormat "%Y-%m-%d"
 
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Gather Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alert report for date ($date).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Gather Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alert report for date ($date).")
 
 $DSMessage = "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for date ($date)."
 
@@ -197,7 +197,7 @@ If ($DiskFreeSpace.FreeSpace -gt 15 )
 	$strCondition = "Good"
 	$end
 	}
- 
+
 If ($DiskFreeSpace.FreeSpace -lt 15 )
 	{
 	#Set the condition = bad.  This represents your script finding something wrong
@@ -207,13 +207,13 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 	$resman= New-Object -ComObject "UIResource.UIResourceMgr"
 	$cacheInfo=$resman.GetCacheInfo()
 	$cacheinfo.GetCacheElements()  | foreach {$cacheInfo.DeleteCacheElement($_.CacheElementID)}
-	
+
 	# get-volume
 	#=====================
 	# $DriveLetter = "C"
 	$ExpandC = get-volume
 	$ExpandAction = $ExpandC | ? { ( $_.SizeRemaining -gt "0" ) -AND ( $_.Driveletter -eq "$DriveLetter" ) }
-	
+
 	if ( $ExpandAction.DriveLetter -eq $true)
 		{
 		$momapi.LogScriptEvent($ScriptName,$EventID,0,"Expand drive via Disk Manager on ($ComputerName)")
@@ -298,7 +298,7 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 		{
 		Write-host "NO MECM\SCCM Action required"
 		}
-		 
+
 	If ( $SoftwareDistribution -gt "3000" )
 		{
 		Write-host "MECM\SCCM Action required, stopping Windows Update service, removing SoftwareDIstribution folder and restarting"
@@ -308,7 +308,7 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 		Write-host "Windows Update wuauserv service restarted after SoftwareDistribution directory removed"
 		}
 
- 
+
 	# Summary Report
 	#==================================
 	$ProfileTableOutput = $ProfileTableObject | sort -property SizeGB -desc | out-string
@@ -339,8 +339,8 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 	$SCCMClientCacheReport += "#===================================="
 	$SCCMClientCacheReport += ""
 	}
-	
-$SCCMClientCacheReport 
+
+$SCCMClientCacheReport
 
 $SCCMClientCacheReport = $SCCMClientCacheReport | out-string
 
@@ -348,16 +348,16 @@ $SCCMClientCacheReport = $SCCMClientCacheReport | out-string
 
 #Check the value of $strCondition
 IF ($strCondition -eq "Good")
-{
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"NO MECM SCCM Team action required")
-  $bag.AddValue('Result',$strCondition)
-}
+	{
+	$momapi.LogScriptEvent($ScriptName,$EventID,0,"NO MECM SCCM Team action required")
+	$bag.AddValue('Result',$strCondition)
+	}
 IF ($strCondition -eq "Bad")
-{
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"$SCCMClientCacheReport")
-  $bag.AddValue('Result',$strCondition)
+	{
+	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$SCCMClientCacheReport")
+	$bag.AddValue('Result',$strCondition)
 	$bag.AddValue('Summary',$SCCMClientCacheReport)
-}
+	}
 
 # Return all bags
 $bag
@@ -370,7 +370,7 @@ $bag
 #Log an event for script ending and total execution time.
 $EndTime = Get-Date
 $ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 #=================================================================================
 # End of script
                 </ScriptBody>
@@ -407,8 +407,8 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                   <WeeklySchedule>
                     <Windows>
                       <Daily>
-                        <Start>10:02</Start>
-                        <End>10:22</End>
+                        <Start>06:02</Start>
+                        <End>06:22</End>
                         <DaysOfWeekMask>62</DaysOfWeekMask>
                       </Daily>
                     </Windows>
@@ -417,7 +417,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                 </Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1025.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1028.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM cache cleanup alerts for team daily report
@@ -429,9 +429,9 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
 
 # Constants section - modify stuff here:
 #=================================================================================
-# Assign script name variable for use in event logging.  
+# Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1025.ps1"
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1028.ps1"
 $EventID = "681"
 #=================================================================================
 
@@ -445,7 +445,7 @@ $whoami = whoami
 # Load MOMScript API
 $momapi = New-Object -comObject MOM.ScriptAPI
 #Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
 #=================================================================================
 
 
@@ -458,11 +458,11 @@ $bag = $momapi.CreatePropertyBag()
 
 # Begin MAIN script section
 #=================================================================================
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Gather Proactive MECM Client Cache Cleanup Alerts for date ($date).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Gather Proactive MECM Client Cache Cleanup Alerts for date ($date).")
 
 #For a simple example - get files in Windows Temp:
 $date = get-date -uFormat "%Y-%m-%d"
-
+$Age = [DateTime](Get-Date).AddDays(-1)
 
 # Grab past 24 hours
 if ( (get-date).DayOfWeek -ne "Monday" )
@@ -473,7 +473,7 @@ if ( (get-date).DayOfWeek -eq "Monday" )
 	{
 	$Time = [DateTime](Get-Date).AddDays(-3)
 	}
-	
+
 
 # Gather MECM alerts
 # Monitors then rules
@@ -483,41 +483,41 @@ $MECMClientCacheAlerts = get-scomalert | ? { ( $_.Name -like "Proactive MECM SCC
 
 
 #$MECMReportAlerts
-$MECMClientCacheAlerts.Count
+#$MECMClientCacheAlerts.Count
 
 # Open MECM server alerts
 $MECMOpenAlerts = $MECMClientCacheAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
-$MECMOpenAlerts.Count
+#$MECMOpenAlerts.Count
 
 # Closed MECM server alerts
 $MECMClosedAlerts = $MECMClientCacheAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$MECMClosedAlerts.Count
+#$MECMClosedAlerts.Count
 
 
 # Client Cache cleanup alerts
 $MECMCacheCleanupAlerts = $MECMClientCacheAlerts | ? { ( $_.Name -like "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for date*" ) }
-$MECMCacheCleanupAlerts.Count
+#$MECMCacheCleanupAlerts.Count
 
 # Open alerts
 $OpenMECMCacheCleanupAlerts = $MECMCacheCleanupAlerts | ? { ( $_.ResolutionState -ne "255" ) }
-$OpenMECMCacheCleanupAlerts.Count
+#$OpenMECMCacheCleanupAlerts.Count
 
 # Closed alerts
 $ClosedMECMCacheCleanupAlerts = $MECMCacheCleanupAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$ClosedMECMCacheCleanupAlerts.Count
+#$ClosedMECMCacheCleanupAlerts.Count
 
 
 # Expand drives via disk manager server alerts
 $MECMExpandDriveAlerts = $MECMClientCacheAlerts | ? { ( $_.Name -like "Expand drive via Disk Manager on*" ) }
-$MECMExpandDriveAlerts.Count
+#$MECMExpandDriveAlerts.Count
 
 # Open MECM server alerts
 $OpenMECMExpandDriveAlerts = $MECMExpandDriveAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
-$OpenMECMExpandDriveAlerts.Count
+#$OpenMECMExpandDriveAlerts.Count
 
 # Closed MECM server alerts
 $ClosedMECMExpandDriveAlerts = $MECMExpandDriveAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$ClosedMECMExpandDriveAlerts.Count
+#$ClosedMECMExpandDriveAlerts.Count
 
 
 # Build report
@@ -531,11 +531,11 @@ if ( $MECMClientCacheAlerts.Count -eq 0 )
 	$MECMTeamReport += "ZERO alerts for Proactive MECM Client Cache Cleanup Alerts for ($date)"
 	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$Message")
 	}
-	
+
 if ( $MECMClientCacheAlerts.Count -gt 0 )
 	{
 	#
-	# Create table output	
+	# Create table output
 
 	#
 	# Show MECM alerts by Time Raised,NetBiosComputerName,Message
@@ -558,15 +558,13 @@ if ( $MECMClientCacheAlerts.Count -gt 0 )
 	$MECMTeamReport += "#========================================================"
 	$MECMTeamReport += ""
 
-
 	# Add logic for alert detail
 
 	$MECMTeamReport += ""
 	$MECMTeamReport += "# OPEN Alert details"
 	$MECMTeamReport += "#==============================="
 	$MECMTeamReport += ""
-	
-	
+
  	if ( $OpenMECMCacheCleanupAlerts.Count -eq 0 )
 		{
 		$MECMTeamReport += "ZERO Open MECM Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for ($date)."
@@ -589,7 +587,7 @@ if ( $MECMClientCacheAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO Open MECM Proactive Expand drive via Disk Manager Alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenMECMExpandDriveAlerts.Count -gt 0 )
 		{
 		$MECMTeamReport += "#"
@@ -604,7 +602,7 @@ if ( $MECMClientCacheAlerts.Count -gt 0 )
 	$MECMTeamReport += "# CLOSED Alert details"
 	$MECMTeamReport += "#==============================="
 	$MECMTeamReport += ""
-	
+
  	if ( $ClosedMECMCacheCleanupAlerts.Count -eq 0 )
 		{
 		$MECMTeamReport += "ZERO Closed MECM Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for ($date)."
@@ -627,7 +625,7 @@ if ( $MECMClientCacheAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO Closed MECM Proactive Expand drive via Disk Manager Alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenMECMExpandDriveAlerts.Count -gt 0 )
 		{
 		$MECMTeamReport += "#"
@@ -638,18 +636,17 @@ if ( $MECMClientCacheAlerts.Count -gt 0 )
 		$MECMTeamReport += ""
 		}
 	}
-	
 
-$MECMTeamReport
+#$MECMTeamReport
 
 $MECMTeamReport = $MECMTeamReport | out-string
 
 #============================================================
 
-  $Result = "GOOD"
-  $Message = "Proactive MECM Client Cache Cleanup Alerts for ($date)"
-
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
+$Result = "GOOD"
+$Message = "Proactive MECM Client Cache Cleanup Alerts for ($date)"
+$MECMTeamReport
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
 
 #$bag.AddValue('Result',$Result)
 $bag.AddValue('Count',$Test)
@@ -662,53 +659,74 @@ $bag
 
 $ReportTime = Get-Date
 $ScriptTime = ($ReportTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM Cache Cleanup Report Completed. `n Script Runtime: ($ScriptTime) seconds.")
 
 
 #
 # If Cleanup needed, array of report monitors
 
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM Client Cache monitor cleanup for ($date).")
+
 $MECMReportMonitorsToClose = @()
 
 $MECMReportMonitorsToClose += "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Monitor"
-	
 
-# Reset open monitors	
+
+# Reset open monitors
 if ( $MECMOpenAlerts.Count -gt 0 )
-{
-foreach ( $MonitorDisplayName in $MECMReportMonitorsToClose )
 	{
-	$Monitors = @(Get-SCOMMonitor -displayname $MonitorDisplayName)
-
-	# Set up monitor objects to reset
-	foreach ($Monitor in $Monitors)
+	foreach ( $MonitorDisplayName in $MECMReportMonitorsToClose )
 		{
-		$MonitorClass = Get-SCOMClass -Id $Monitor.Target.Id
-		$ActiveMonitors = Get-SCOMClassInstance -Class $MonitorClass | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) }
-		write-host "Found" + $ActiveMonitors.Count + "active monitors."
-		if ( $ActiveMonitors -ne $null)
+		$Monitors = @(Get-SCOMMonitor -displayname $MonitorDisplayName)
+
+		# Set up monitor objects to reset
+		foreach ($Monitor in $Monitors)
 			{
-			foreach ($ActiveMonitor in $ActiveMonitors)
+			$MonitorClass = Get-SCOMClass -Id $Monitor.Target.Id
+			$ActiveMonitors = Get-SCOMClassInstance -Class $MonitorClass | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) }
+			# Debug
+			$ActiveMonitors.Count
+			# $ActiveMonitors | fl -property *
+			#write-host "Found" + $ActiveMonitors.Count + "active monitors of " $Monitor
+			foreach ( $UnhealthyOLDMonitor in $ActiveMonitors )
 				{
-				write-host " Resetting Health State on '" +$ActiveMonitor.FullName + "'" 
-				$ActiveMonitor.ResetMonitoringState($Monitor.ID)
+				#if ( $UnhealthyOLDMonitor.AvailabilityLastModified -lt $Age )
+				if ( $UnhealthyOLDMonitor.StateLastModified -lt $Age )
+					{
+					#$UnhealthyMonitors += $ActiveMonitors.Count
+					#UnhealthyOLDMonitor | select AvailabilityLastModified,Path,DisplayName
+					#$UnhealthyOLDMonitor.Count
+					#write-host "Found" + $UnhealthyOLDMonitor.Count + "unhealthy monitor beyond" $Age "days."
+					#write-host ""
+					if ( $ActiveMonitors.Count -gt 0)
+						{
+						foreach ( $ActiveMonitor in $UnhealthyOLDMonitor )
+							{
+							# Debug
+							$ActiveMonitor.ID
+							write-host " Resetting Health State on '" + $ActiveMonitor.FullName + "'" 
+							write-host ""
+							$ActiveMonitor.ResetMonitoringState($ActiveMonitor)
+							}
+						}
+					}
 				}
 			}
 		}
 	}
-}
 
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM Client Cache monitor cleanup for ($date).")
 
 #=================================================================================
 # End MAIN script section
 
-  
+
 # End of script section
 #=================================================================================
 #Log an event for script ending and total execution time.
 $EndTime = Get-Date
 $ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 #=================================================================================
 # End of script
                 </ScriptBody>
@@ -739,8 +757,8 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                   <WeeklySchedule>
                     <Windows>
                       <Daily>
-                        <Start>10:00</Start>
-                        <End>10:20</End>
+                        <Start>06:00</Start>
+                        <End>06:20</End>
                         <DaysOfWeekMask>62</DaysOfWeekMask>
                       </Daily>
                     </Windows>
@@ -749,7 +767,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                 </Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1025.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1028.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alerts for team daily report
@@ -761,9 +779,9 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
 
 # Constants section - modify stuff here:
 #=================================================================================
-# Assign script name variable for use in event logging.  
+# Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1025.ps1"
+$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1028.ps1"
 $EventID = "681"
 #=================================================================================
 
@@ -777,7 +795,7 @@ $whoami = whoami
 # Load MOMScript API
 $momapi = New-Object -comObject MOM.ScriptAPI
 #Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
 #=================================================================================
 
 
@@ -804,12 +822,12 @@ if ( (get-date).DayOfWeek -eq "Monday" )
 	$Time = [DateTime](Get-Date).AddDays(-3)
 	}
 
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Gather MECM Alerts for date ($date).")
-	
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Gather MECM Alerts for date ($date).")
+
 
 # Gather MECM alerts
 # Monitors then rules
-$MECMReportAlerts = get-scomalert | ? { ( $_.Name -eq "Available Megabytes of Memory is too low" ) `
+$MECMReportAlerts = get-scomalert -ResolutionState (0..254) | ? { ( $_.Name -eq "Available Megabytes of Memory is too low" ) `
 	-OR ( $_.Name -eq "Action Account Not Configured Correctly" ) `
 	-OR ( $_.Name -like "Asset Intelligence*" ) `
 	-OR ( $_.Name -eq "Certificate lifespan alert" ) `
@@ -845,7 +863,7 @@ $MECMReportAlerts = get-scomalert | ? { ( $_.Name -eq "Available Megabytes of Me
 	-OR ( $_.Name -eq "Site Roles" ) `
 	-OR ( $_.Name -like "Site Server*" ) `
 	-OR ( $_.Name -eq "SMSExec CPU Usage is Too High" ) `
-	-OR ( $_.Name -eq "Software Update Point Not Available" ) `	
+	-OR ( $_.Name -eq "Software Update Point Not Available" ) `
 	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
 	-OR ( $_.Name -eq "State Migration Point Not Available" ) `
 	-OR ( $_.Name -eq "System Center Management Health Service Unloaded System Rule(s)") `
@@ -864,34 +882,80 @@ $MECMReportAlerts = get-scomalert | ? { ( $_.Name -eq "Available Megabytes of Me
 
 
 #$MECMReportAlerts
-$MECMReportAlerts.Count
-
+#$MECMReportAlerts.Count
 
 
 # Break out alerts into MECM servers
 $MECMServerAlerts = @()
 
-$MECMServerAlerts = $MECMReportAlerts | ? { ( $_.NetBiosComputerName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.NetBiosComputerName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.NetBiosComputerName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "D*JJ0[1-3]S*" ) `
+$MECMServerAlerts = $MECMReportAlerts | ? { ( $_.NetBiosComputerName -like "*##MECMServerRegEX##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*##MECMServerRegEX##*" ) `
 	}
 
-$MECMServerAlerts.Count
+#$MECMServerAlerts.Count
 
 # Open MECM server alerts
 $MECMOpenAlerts = $MECMServerAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
-$MECMOpenAlerts.Count
+#$MECMOpenAlerts.Count
 
 # Open MECM server alerts since last report
 $MECMAlertsSinceReport = $MECMServerAlerts | ? { ( $_.TimeRaised -ge $Time ) }
-$MECMAlertsSinceReport.Count
+#$MECMAlertsSinceReport.Count
 
 # Closed MECM server alerts
-$MECMClosedAlerts = $MECMServerAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$MECMClosedAlerts.Count
+$MECMClosedAlerts = get-scomalert -ResolutionState 255 | ? { ( $_.Name -eq "Available Megabytes of Memory is too low" ) `
+	-OR ( $_.Name -eq "Action Account Not Configured Correctly" ) `
+	-OR ( $_.Name -like "Asset Intelligence*" ) `
+	-OR ( $_.Name -eq "Certificate lifespan alert" ) `
+	-OR ( $_.Name -eq "Component stopped alert" ) `
+	-OR ( $_.Name -eq "Content distribution alert" ) `
+	-OR ( $_.Name -like "DFS-R: *" ) `
+	-OR ( $_.Name -like "DHCP*" ) `
+	-OR ( $_.Name -eq "DHCP Service Stopped" ) `
+	-OR ( $_.Name -eq "Distribution fails to access network alert" ) `
+	-OR ( $_.Name -eq "DNS Client Service Stopped" ) `
+	-OR ( $_.Name -eq "Event log is full" ) `
+	-OR ( $_.Name -eq "Fail to access site system alert" ) `
+	-OR ( $_.Name -eq "Fail to read Active Directory alert" ) `
+	-OR ( $_.Name -eq "Fail to update Active Directory alert" ) `
+	-OR ( $_.Name -eq "Failed to Connect to Computer" ) `
+	-OR ( $_.Name -eq "Failed to install application on client" ) `
+	-OR ( $_.Name -eq "File Dispatch Manager Not Connecting to Site Server" ) `
+	-OR ( $_.Name -eq "Health Service Heartbeat Failure" ) `
+	-OR ( $_.Name -eq "Logical disk current queue length is too high" ) `
+	-OR ( $_.Name -eq "Logical Disk Free Space is low" ) `
+	-OR ( $_.Name -like "Logical disk transfer*" ) `
+	-OR ( $_.Name -eq "Maintenance task failure alert" ) `
+	-OR ( $_.Name -like "Management point*" ) `
+	-OR ( $_.Name -eq "Max Concurrent API Reached alert" ) `
+	-OR ( $_.Name -eq "Memory Pages Per Second is too High." ) `
+	-OR ( $_.Name -eq "Microsoft Windows Server AD PasswordCheck Script Alert Rule" ) `
+	-OR ( $_.Name -like "MSSQL*" ) `
+	-OR ( $_.Name -eq "NTFS reported the logical disk is in error or corrupt." ) `
+	-OR ( $_.Name -eq "Percentage of Committed Memory in Use is too high" ) `
+	-OR ( $_.Name -like "PROACTIVE -*" ) `
+	-OR ( $_.Name -eq "Run As Account Could Not Log On" ) `
+	-OR ( $_.Name -like "Site Component*" ) `
+	-OR ( $_.Name -eq "Site Roles" ) `
+	-OR ( $_.Name -like "Site Server*" ) `
+	-OR ( $_.Name -eq "SMSExec CPU Usage is Too High" ) `
+	-OR ( $_.Name -eq "Software Update Point Not Available" ) `
+	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
+	-OR ( $_.Name -eq "State Migration Point Not Available" ) `
+	-OR ( $_.Name -eq "System Center Management Health Service Unloaded System Rule(s)") `
+	-OR ( $_.Name -eq "System Center Management Health Service Unable to Process New Configuration" ) `
+	-OR ( $_.Name -eq "System summary task failure alert" ) `
+	-OR ( $_.Name -eq "TCP/IP NetBIOS Service Stopped" ) `
+	-OR ( $_.Name -eq "Total CPU Utilization Percentage is too high" ) `
+	-OR ( $_.Name -eq "VMware (High): Virtual Machine CPU Usage is High" ) `
+	-OR ( $_.Name -eq "Windows Event Log Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Firewall Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Remote Management Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Server Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Storport Miniport Driver has timed out a request" ) `
+	-OR ( $_.Name -eq "WSUS Synchronization Failed" ) `
+	}
+#$MECMClosedAlerts.Count
 
 
 #
@@ -909,16 +973,29 @@ $MECMAppAlerts = $MECMServerAlerts | ? { ( $_.Name -eq "Component stopped alert"
 	-OR ( $_.Name -like "Site server*" ) `
 	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
 	-OR ( $_.Name -eq "WSUS Synchronization Failed" ) `
-	} 
+	}
 	# | ? { $_.TimeRaised -gt $Time }
 
-$MECMAppAlerts.Count
+#$MECMAppAlerts.Count
 
-$OpenMECMAppAlerts = $MECMAppAlerts | ? { ( $_.ResolutionState -ne "255" ) }
-$OpenMECMAppAlerts.Count
+$OpenMECMAppAlerts = $MECMAppAlerts
+#$OpenMECMAppAlerts.Count
 
-$ClosedMECMAppAlerts = $MECMAppAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$ClosedMECMAppAlerts.Count
+$ClosedMECMAppAlerts = $MECMClosedAlerts | ? { ( $_.Name -eq "Component stopped alert" ) `
+	-OR ( $_.Name -eq "Content distribution alert" ) `
+	-OR ( $_.Name -eq "Distribution fails to access network alert" ) `
+	-OR ( $_.Name -eq "Fail to read Active Directory alert" ) `
+	-OR ( $_.Name -eq "Fail to update Active Directory alert" ) `
+	-OR ( $_.Name -eq "File Dispatch Manager Not Connecting to Site Server" ) `
+	-OR ( $_.Name -eq "Maintenance task failure alert" ) `
+	-OR ( $_.Name -like "Management point*" ) `
+	-OR ( $_.Name -eq "MSSQL on Windows: Filegroup is running out of space" ) `
+	-OR ( $_.Name -eq "MSSQL on Windows: Database ROWS Data is Out of Space" ) `
+	-OR ( $_.Name -like "Site server*" ) `
+	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
+	-OR ( $_.Name -eq "WSUS Synchronization Failed" ) `
+	}
+#$ClosedMECMAppAlerts.Count
 
 
 
@@ -928,18 +1005,17 @@ $ClosedMECMAppAlerts.Count
 #
 # PROACTIVE - Server restart pending detected
 $PendingRestart = $MECMServerAlerts | ? { ( $_.Name -eq "PROACTIVE - Server restart pending detected" ) `
-	} 
+	}
 	#| ? { $_.TimeRaised -gt $Time }
 
-$PendingRestart.Count
-
-$OpenPendingRestart = $PendingRestart | ? { $_.ResolutionState -ne "255" }
-$OpenPendingRestart.Count
-
-$ClosedPendingRestart = $PendingRestart | ? { $_.ResolutionState -eq "255" }
-$ClosedPendingRestart.Count
-
+#$PendingRestart.Count
 $PendingRestart = $PendingRestart | ft NetbiosComputerName,TimeRaised -auto -wrap
+
+$OpenPendingRestart = $PendingRestart
+#$OpenPendingRestart.Count
+
+$ClosedPendingRestart = $MECMClosedAlerts | ? { ( $_.Name -eq "PROACTIVE - Server restart pending detected" ) }
+#$ClosedPendingRestart.Count
 
 
 #
@@ -947,15 +1023,14 @@ $PendingRestart = $PendingRestart | ft NetbiosComputerName,TimeRaised -auto -wra
 $NotRebooted = $MECMServerAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT rebooted in past month" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$NotRebooted.Count
-
-$OpenNotRebooted = $NotRebooted | ? { $_.ResolutionState -ne "255" }
-$OpenNotRebooted.Count
-
-$ClosedNotRebooted = $NotRebooted | ? { $_.ResolutionState -eq "255" }
-$ClosedNotRebooted.Count
-
+#$NotRebooted.Count
 $NotRebooted = $NotRebooted | ft NetbiosComputerName,TimeRaised -auto -wrap
+
+$OpenNotRebooted = $NotRebooted
+#$OpenNotRebooted.Count
+
+$ClosedNotRebooted = $MECMClosedAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT rebooted in past month" ) }
+#$ClosedNotRebooted.Count
 
 
 #
@@ -963,15 +1038,14 @@ $NotRebooted = $NotRebooted | ft NetbiosComputerName,TimeRaised -auto -wrap
 $NotPatched = $MECMServerAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT patched in past month" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$NotPatched.Count
-
-$OpenNotPatched = $NotPatched | ? { $_.ResolutionState -ne "255" }
-$OpenNotPatched.Count
-
-$ClosedNotPatched = $NotPatched | ? { $_.ResolutionState -eq "255" }
-$ClosedNotPatched.Count
-
+#$NotPatched.Count
 $NotPatched = $NotPatched | ft NetbiosComputerName,TimeRaised -auto -wrap
+
+$OpenNotPatched = $NotPatched
+#$OpenNotPatched.Count
+
+$ClosedNotPatched = $MECMClosedAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT patched in past month" ) }
+#$ClosedNotPatched.Count
 
 
 #
@@ -979,7 +1053,7 @@ $NotPatched = $NotPatched | ft NetbiosComputerName,TimeRaised -auto -wrap
 $FailedAppInstall = $MECMReportAlerts | ? { ( $_.Name -eq "Failed to install application on client" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 	
-$FailedAppInstall.Count
+#$FailedAppInstall.Count
 
 
 #
@@ -993,15 +1067,21 @@ $HighAlerts = $MECMServerAlerts | ? { ( $_.Name -eq "Percentage of Committed Mem
 	-OR ( $_.Name -like "Logical disk transfer*" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$HighAlerts.Count
+#$HighAlerts.Count
 #$HighAlerts = $HighAlerts | ft NetBiosComputerName,TimeRaised,Name -auto
 
-$OpenHighAlerts = $HighAlerts | ? { $_.ResolutionState -ne "255" }
-$OpenHighAlerts.Count
+$OpenHighAlerts = $HighAlerts
+#$OpenHighAlerts.Count
 
-
-$ClosedHighAlerts = $HighAlerts | ? { $_.ResolutionState -eq "255" }
-$ClosedHighAlerts.Count
+$ClosedHighAlerts = $MECMClosedAlerts | ? { ( $_.Name -eq "Percentage of Committed Memory in Use is too high" ) `
+	-OR ( $_.Name -eq "Total CPU Utilization Percentage is too high" ) `
+	-OR ( $_.Name -eq "VMware (High): Virtual Machine CPU Usage is High" ) `
+	-OR ( $_.Name -eq "The LSASS process has exceeded the processor utilization threshold over multiple samples." ) `
+	-OR ( $_.Name -eq "SMSExec CPU Usage is Too High" ) `
+	-OR ( $_.Name -eq "Memory Pages Per Second is too High." ) `
+	-OR ( $_.Name -like "Logical disk transfer*" ) `
+	}
+#$ClosedHighAlerts.Count
 
 
 #
@@ -1010,58 +1090,55 @@ $ActionAccountAlerts = $MECMServerAlerts | ? { ( $_.Name -eq "Action Account Not
 	-OR ( $_.Name -eq "Run As Account Could Not Log On" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$ActionAccountAlerts.Count
+#$ActionAccountAlerts.Count
 
-$OpenActionAccountAlerts = $ActionAccountAlerts | ? { $_.ResolutionState -ne "255" }
-$OpenActionAccountAlerts.Count
+$OpenActionAccountAlerts = $ActionAccountAlerts
+#$OpenActionAccountAlerts.Count
 
-$ClosedActionAccountAlerts = $ActionAccountAlerts | ? { $_.ResolutionState -eq "255" }
-$ClosedActionAccountAlerts.Count
-	
+$ClosedActionAccountAlerts = $MECMClosedAlerts | ? { ( $_.Name -eq  "Action Account Not Configured Correctly" ) `
+	-OR ( $_.Name -eq "Run As Account Could Not Log On" ) `
+	}
+#$ClosedActionAccountAlerts.Count
+
 #
 # Test totals of alerts
 $Test = $MECMServerAlerts.count + $FailedAppInstall.Count
-$Test
+#$Test
 
 
 
 # 
 # Unhealthy/Maintenance mode agents
-# 
-  # Gather Details section
-  # $Details = get-scomagent | ? { $_.HealthState -ne "Success" } |ft DisplayName| out-string
-  $Details
+#
+# Gather Details section
+# $Details = get-scomagent | ? { $_.HealthState -ne "Success" } |ft DisplayName| out-string
+#$Details
+
+$Class = (get-scomclass -Name "Microsoft.Windows.Computer" )
+$instance = ( $Class | ? { $_.Name -like "Microsoft.Windows.Computer" }  |Get-SCOMClassInstance )
   
-  $Class = (get-scomclass -Name "Microsoft.Windows.Computer" )
-  $instance = ( $Class | ? { $_.Name -like "Microsoft.Windows.Computer" }  |Get-SCOMClassInstance )
-  
-  $MM = ($Instance | ? { $_.InMaintenanceMode -eq "True" }).DisplayName `
-	| ? { ( $_.DisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.DisplayName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.DisplayName -like "[1DHSW][26CVPF]*" ) `
+ $MM = ($Instance | ? { $_.InMaintenanceMode -eq "True" }).DisplayName `
+	| ? { ( $_.DisplayName -like "*##MECMServerRegEX##*" ) `
 	}
-	write-host "MM Maintenance mode Agents `n" ; $Unhealthy.InputObject
+	#write-host "MM Maintenance mode Agents `n" ; $Unhealthy.InputObject
     $MaintM = $MM | sort | out-string
 
 
 #  $UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).DisplayName `
 $UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).DisplayName `
-	| ? { ( $_.DisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.DisplayName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.DisplayName -like "[1DHSW][26CVPF]*" ) `
+	| ? { ( $_.DisplayName -like "*##MECMServerRegEX##*" ) `
 	}
 
- if ( $MM.Count -gt 0 )
+if ( $MM.Count -gt 0 )
 	{
 	$CompareMM = compare-object -ReferenceObject $MM -DifferenceObject $UnhealthyAgents
 	}
 
 
-
   #foreach ( $server in $UnHealthyAgents )
 	#{
-	#if ( ! $($MaintM | select-string $server) -eq $True ) 
-		#{ 
+	#if ( ! $($MaintM | select-string $server) -eq $True )
+		#{
 		#write-host $server "is in Maintenance"
 		#$Unhealthy += "$server"
 		#}
@@ -1069,28 +1146,23 @@ $UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).Displa
 
   #$Unhealthy
   #$Details = $Unhealthy.InputObject
-  
-  
+
+
 #$MECMReportAlerts
-#$DownAgents = get-SCOMAlert | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
+#$DownAgents = get-SCOMAlert -ResolutionState (0..254) | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
 # If you want to know alerts for all Down, don't use $MECMReportAlerts (has $Time built in)
 #  $DownAgents = $MECMReportAlerts | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
 $DownAgents = get-SCOMAlert | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
 	-OR ( $_.Name -eq "Failed to Connect to Computer" ) `
 	-OR ( $_.Name -eq "System Center Management Health Service Unloaded System Rule(s)") `
 	-OR ( $_.Name -eq "System Center Management Health Service Unable to Process New Configuration" ) `
-	}   | ? { $_.ResolutionState -ne "255"} `
-	| ? { ( $_.NetBiosComputerName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.NetBiosComputerName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.NetBiosComputerName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "D*JJ0[1-3]S*" ) `
+	} | ? { ( $_.NetBiosComputerName -like "*##MECMServerRegEX##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*##MECMServerRegEX##*" ) `
 	}
-	
- 
-  #$DownAgents
-  #$DownAgents.count
+
+
+#$DownAgents
+#$DownAgents.count
 
 
 if ( $DownAgents.Count -gt 0 )
@@ -1098,10 +1170,10 @@ if ( $DownAgents.Count -gt 0 )
     $CompareDown = compare-object -ReferenceObject $DownAgents -DifferenceObject $UnhealthyAgents
 	# Format output of DownAgents
 	$Down = $DownAgents | ft MonitoringObjectDisplayName,TimeRaised,Name -autosize | out-string
-	$Down
+	#$Down
 	}
 
-	
+
 if ( $DownAgents.Count -eq 0 )
 	{
 	$Compare = $MM.Count + $CompareMM.Count
@@ -1111,22 +1183,22 @@ if ( $DownAgents.Count -eq 0 )
 
 # Compare Unhealthy agents
 $Unhealthy = @()
-	
+
 if ( $UnHealthyAgents.Count -eq 0 )
 	{
 	$Unhealthy += ""
 	$Unhealthy += "ZERO NOT healthy agents as of report run"
 	}
-	
+
 if ( $UnHealthyAgents.Count -gt 0 )
 	{
 	$Unhealthy += ""
 	$Unhealthy += $UnHealthyAgents | sort | out-string
 	$Unhealthy += ""
 	}
-	
-  $Test = $DownAgents.Count +   $UnHealthyAgents.Count
-  $Test
+
+$Test = $DownAgents.Count +   $UnHealthyAgents.Count
+#$Test
 
 
 #===============================================
@@ -1134,71 +1206,65 @@ if ( $UnHealthyAgents.Count -gt 0 )
 # Logical Disk free space alerts
 #===============================================
 
-$LDSTest = get-scomalert -name "Logical disk Free space is low" | ? { ( $_.NetbiosComputerName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.NetbiosComputerName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.NetbiosComputerName -like "[1DHSW][26CVPF]**" ) `
-	}
+$LDSTest = $MECMReportAlerts | ? { ( $_.Name -eq "Logical disk Free space is low" ) }
 
 if ( $LDSTest.Count -gt 0 )
 	{
-	$LDSTest
+	#$LDSTest
 
 	# Gather details
 	$LDSSummary = $LDSTest |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
 	# Gather Details section
 	$LDSDetails = $LDSTest | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
 
-	$LDSSummary
-	$LDSDetails
-  
-	$OpenLDSTest = $LDSTest | ? { $_.ResolutionState -ne "255" }
-	$OpenLDSTest.Count
+	#$LDSSummary
+	#$LDSDetails
+
+	$OpenLDSTest = $LDSTest
+	#$OpenLDSTest.Count
 
 	if ( $OpenLDSTest.Count -gt 0 )
 		{
 		# Summary
-		$LDSOpenSummary = $LDSTest | ? { $_.ResolutionState -ne "255" } |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
+		$LDSOpenSummary = $LDSTest |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
 		# Gather Details
-		$LDSOpenDetails = $LDSTest | ? { $_.ResolutionState -ne "255" } | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
+		$LDSOpenDetails = $LDSTest | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
 		}
-		
-	$ClosedLDSTest = $LDSTest | ? { $_.ResolutionState -eq "255" }
-	$ClosedLDSTest.Count
+
+	$ClosedLDSTest = $MECMClosedAlerts | ? { ( $_.Name -eq "Logical disk Free space is low" ) }
+	#$ClosedLDSTest.Count
 
 	if ( $ClosedLDSTest.Count -gt 0 )
 		{
 		# Summary
-		$LDSClosedSummary = $LDSTest | ? { $_.ResolutionState -eq "255" } |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
+		$LDSClosedSummary = $ClosedLDSTest |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
 		# Gather Details section
-		$LDSClosedDetails = $LDSTest | ? { $_.ResolutionState -eq "255" } | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
+		$LDSClosedDetails = $ClosedLDSTest | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
 		}
 	}
-	
+
+
 #===============================================
 # Expiring certificates
 # Certificates about to expire/expired
 #===============================================
 
-  $Class = (get-scomclass -DisplayName "Certificate" )
-  $instance = ( $Class |Get-SCOMClassInstance )
-  $MECMPKIexpired = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
-  	# PKI certs can have Certstore, but it's not always searchable/display capable
+$Class = (get-scomclass -DisplayName "Certificate" )
+$instance = ( $Class |Get-SCOMClassInstance )
+$MECMPKIexpired = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
+	# PKI certs can have Certstore, but it's not always searchable/display capable
 	#} | ? { $_.CertStore -like "Intermediate Certification*" `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
-	
-  $MECMPKIexpired.count
+
+#$MECMPKIexpired.count
 
 $MECMPKIpersonal = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
 	} | ? { ( $_.CertStore -eq "Personal" ) `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
 
-  $MECMPKIpersonal.count
+#$MECMPKIpersonal.count
 
 # Intermediate Cert Check
 	# PKI certs can have Certstore, but it's not always searchable/display capable
@@ -1206,21 +1272,17 @@ $MECMPKIpersonal = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.He
 
 $MECMIntermediate = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
 	} | ? { $_.CertStore -like "Intermediate Certification*" `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
 	
-$MECMIntermediate.Count
+#$MECMIntermediate.Count
 
 
 $MECMRootCerts = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
 	} | ? { $_.CertStore -like "Root" `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
-$MECMRootCerts.Count
+	#$MECMRootCerts.Count
 
 
 #
@@ -1245,11 +1307,9 @@ $MECMRemaining = $MECMServerAlerts | ? { ( $_.Name -notlike "Proactive*" ) `
 	-AND ( $_.Name -eq "WSUS Synchronization Failed" ) `
 	}
 
-$MECMRemaining
+#$MECMRemaining
 
 $MECMRemaining = $MECMRemaining | ft NetbiosComputerName,TimeRaised,Name -auto -wrap
-
-
 
 
 # Build report
@@ -1263,7 +1323,7 @@ if ( $MECMServerAlerts.Count -eq 0 )
 	$MECMTeamReport += "ZERO alerts for MECM Team Daily report for ($date)"
 	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$Message")
 	}
-	
+
 if ( $MECMServerAlerts.Count -gt 0 )
 	{
 	#
@@ -1320,7 +1380,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
  	$MECMTeamReport += "# Servers NOT patched = $($ClosedNotPatched.Count)"
 	$MECMTeamReport += "#========================================================"
 	$MECMTeamReport += ""
- 
+
 	#$MECMServerAlerts = $MECMServerAlerts | ft NetbiosComputerName,TimeRaised,Name -auto -wrap
 	#$MECMServerAlerts
 
@@ -1368,7 +1428,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM Logical Disk free space alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenLDSTest.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -1391,7 +1451,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM Application alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenMECMAppAlerts.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -1400,14 +1460,14 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += $OpenMECMAppAlerts | ft NetbiosComputerName,Parameters,Name -auto | out-string
 		$MECMTeamReport += ""
 		}
-	
-	
+
+
 	if ( $OpenHighAlerts.Count -eq 0 )
 		{
 		$MECMTeamReport += "ZERO MECM Performance alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-	
+
 	if ( $OpenHighAlerts.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -1416,14 +1476,14 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += $OpenHighAlerts |ft TimeRaised,NetBiosComputerName,Description -auto -wrap | out-string
 		$MECMTeamReport += ""
 		}
-		
-		
+
+
 	if ( $MECMPKIexpired.Count -eq 0 )
 		{
 		$MECMTeamReport += "ZERO MECM PKI Certificates about to expire for ($date)."
 		$MECMTeamReport += ""
 		}
-	
+
 	if ( $MECMPKIexpired.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -1491,7 +1551,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM other MECM Operating System issues for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $MECMRemaining.count -gt 0 )
 		{
 		$MECMTeamReport += "# Other MECM application OR Operating System issues "
@@ -1507,7 +1567,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM 'Failed to install' application errors for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenFailedAppInstall.Count -gt 0 )
 		{
 		$FailedAppInstall = $FailedAppInstall | ft NetbiosComputerName,TimeRaised,Description -auto -wrap | out-string
@@ -1523,7 +1583,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM servers pending restart for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenPendingRestart.count -gt 0 )
 		{
 		$MECMTeamReport += "# MECM servers pending reboot for patches"
@@ -1553,7 +1613,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM servers NOT patched in past 35 days as of ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenNotPatched.count -gt 0 )
 		{
 		$MECMTeamReport += "# MECM servers not patched (at least 35 days pass before alert)"
@@ -1568,7 +1628,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM Action Account errors for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenActionAccountAlerts.count -gt 0 )
 		{
 		$MECMTeamReport += "# MECM Action Account alert detail"
@@ -1579,20 +1639,20 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += $OpenActionAccountAlerts | ft NetbiosComputerName,Parameters  -auto | out-string
 		$MECMTeamReport += "#============================================="
 		}
-	
+
 	$MECMTeamReport += ""
 	}
 
-$MECMTeamReport
+#$MECMTeamReport
 
 $MECMTeamReport = $MECMTeamReport | out-string
 
 #============================================================
 
-  $Result = "GOOD"
-  $Message = "MECM Team Daily report for ($date)"
-
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
+	$Result = "GOOD"
+	$Message = "MECM Team Daily report for ($date)"
+	$MECMTeamReport
+	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
 
 #$bag.AddValue('Result',$Result)
 $bag.AddValue('Count',$Test)
@@ -1605,19 +1665,19 @@ $bag
 
 $ReportTime = Get-Date
 $ScriptTime = ($ReportTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 
 
 #=================================================================================
 # End MAIN script section
 
-  
+
 # End of script section
 #=================================================================================
 #Log an event for script ending and total execution time.
 $EndTime = Get-Date
 $ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 #=================================================================================
 # End of script
                 </ScriptBody>
@@ -1648,8 +1708,8 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                   <WeeklySchedule>
                     <Windows>
                       <Daily>
-                        <Start>10:03</Start>
-                        <End>10:23</End>
+                        <Start>06:03</Start>
+                        <End>06:23</End>
                         <DaysOfWeekMask>62</DaysOfWeekMask>
                       </Daily>
                     </Windows>
@@ -1658,7 +1718,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
                 </Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1025.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1028.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alerts for team daily alert cleanup
@@ -1670,9 +1730,9 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
 
 # Constants section - modify stuff here:
 #=================================================================================
-# Assign script name variable for use in event logging.  
+# Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1025.ps1"
+$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1028.ps1"
 $EventID = "681"
 #=================================================================================
 
@@ -1686,7 +1746,7 @@ $whoami = whoami
 # Load MOMScript API
 $momapi = New-Object -comObject MOM.ScriptAPI
 #Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
 #=================================================================================
 
 
@@ -1701,7 +1761,7 @@ $bag = $momapi.CreatePropertyBag()
 #=================================================================================
 #For a simple example - get files in Windows Temp:
 $date = get-date -uFormat "%Y-%m-%d"
-
+$Age = [DateTime](Get-Date).AddDays(-1)
 
 # Grab past 24 hours
 if ( (get-date).DayOfWeek -ne "Monday" )
@@ -1712,95 +1772,31 @@ if ( (get-date).DayOfWeek -eq "Monday" )
 	{
 	$Time = [DateTime](Get-Date).AddDays(-3)
 	}
-	
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Cleanup MECM Alerts for date ($date).")
+
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Cleanup MECM Alerts for date ($date).")
 
 
 # Cleanup MECM alerts
 #===============================================
-# Proactive DailyTasks MECM Team Cleanup Script Alert Rule
-#
-# If Cleanup needed, array of report monitors
-#===============================================
+## Grab the MP, get the Monitors and Rules from the MP, then grab all alerts found inside the Monitors/Rules
+$SCOMCoreMP = Get-SCOMManagementPack -DisplayName "Microsoft System Center 2012 Configuration Manager Monitoring"
+$SCOMCoreRules = $SCOMCoreMP.GetRules()
+$SCOMCoreMonitors = $SCOMCoreMP.GetMonitors()
 
-$MECMReportMonitorsToClose = @()
+$SCOMCoreReportAlerts = Get-SCOMAlert -ResolutionState (0..254) | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
+$SCOMCoreReportAlerts.Count
 
-$MECMReportMonitorsToClose += "Application Deployment Alert"
-$MECMReportMonitorsToClose += "Auto-started component stopped unexpectedly"
-$MECMReportMonitorsToClose += "Average Logical Disk Seconds Per Transfer"
-$MECMReportMonitorsToClose += "Available Megabytes of Memory"
-$MECMReportMonitorsToClose += "Backup Status Monitor"
-$MECMReportMonitorsToClose += "Certificate lifespan"
-$MECMReportMonitorsToClose += "Component manager fails to access site system"
-$MECMReportMonitorsToClose += "Current Disk Queue Length (Logical Disk)"
-$MECMReportMonitorsToClose += "DHCP Client Service Health"
-$MECMReportMonitorsToClose += "Distribution manager fails to access network"
-$MECMReportMonitorsToClose += "Distribution point pool"
-$MECMReportMonitorsToClose += "DNS Client Service Health"
-$MECMReportMonitorsToClose += "Computer Not Reachable"
-$MECMReportMonitorsToClose += "Fail to execute system summary task"
-$MECMReportMonitorsToClose += "File Dispatch Manager Connection Monitor"
-$MECMReportMonitorsToClose += "File system error or corruption"
-$MECMReportMonitorsToClose += "Health Service Heartbeat Failure"
-$MECMReportMonitorsToClose += "Logical Disk Free Space Monitor"
-$MECMReportMonitorsToClose += "Max Concurrent API Monitor"
-$MECMReportMonitorsToClose += "Memory Pages Per Second"
-$MECMReportMonitorsToClose += "Percentage of Committed Memory in Use"
-$MECMReportMonitorsToClose += "Sender fails to connect to a remote site over LAN advanced security"
-$MECMReportMonitorsToClose += "Server Last Patch Applied Monitor"
-$MECMReportMonitorsToClose += "Server Pending Restart Monitor"
-$MECMReportMonitorsToClose += "Server Service Health"
-$MECMReportMonitorsToClose += "Server Uptime Monitor"
-$MECMReportMonitorsToClose += "Site component manager fails to read Active Directory objects"
-$MECMReportMonitorsToClose += "Site component manager fails to update Active Directory objects"
-$MECMReportMonitorsToClose += "Site Roles"
-$MECMReportMonitorsToClose += "Site server fails to execute a maintenance task"
-$MECMReportMonitorsToClose += "Software Update Point Availability Monitor"
-$MECMReportMonitorsToClose += "SQL Server Port Monitor"
-$MECMReportMonitorsToClose += "SQL Server Firewall Port Monitor"
-$MECMReportMonitorsToClose += "ROWS Data Free Space Left"
-$MECMReportMonitorsToClose += "DB Files Performance"
-$MECMReportMonitorsToClose += "Average Logical Disk Seconds Per Transfer"
-$MECMReportMonitorsToClose += "Memory Pages Per Second"
-$MECMReportMonitorsToClose += "Perf Threshold: Site server auth ddm inbox backlog monitor"
-$MECMReportMonitorsToClose += "WSUS Synchronization Failed"
-$MECMReportMonitorsToClose += "Perf Threshold: Site server HINV process backlog monitor"
-$MECMReportMonitorsToClose += "Perf Threshold: Management point relaymgr backlog monitor"
-$MECMReportMonitorsToClose += "Perf Threshold: Management point status backlog monitor"
-$MECMReportMonitorsToClose += "State Migration Point Availability Monitor"
-$MECMReportMonitorsToClose += "Storport Miniport Driver Timed Out Monitor"
-$MECMReportMonitorsToClose += "TCP/IP NetBIOS Service Health"
-$MECMReportMonitorsToClose += "Total CPU Utilization Percentage is too high"	
-$MECMReportMonitorsToClose += "Windows Event Log Service Health"
-$MECMReportMonitorsToClose += "Windows Firewall Service Health"
-$MECMReportMonitorsToClose += "Windows Remote Management Service Health"
-$MECMReportMonitorsToClose += "WSUS Synchronization Failed"
-	
+$SCOMCoreRuleAlerts = $SCOMCoreReportAlerts | ? { ( $_.Name -in $SCOMCoreRules.DisplayName) }
+$SCOMCoreRuleAlerts.Count
 
-# Reset open monitors	
-#
-foreach ( $MonitorDisplayName in $MECMReportMonitorsToClose )
-	{
-	$Monitors = @(Get-SCOMMonitor -displayname $MonitorDisplayName)
+$SCOMCoreMonitorAlerts = $SCOMCoreReportAlerts | ? { ($_.Name -in $SCOMCoreMonitors.DisplayName ) }
+$SCOMCoreMonitorAlerts.Count
 
-	# Set up monitor objects to reset
-	foreach ($Monitor in $Monitors)
-		{
-		$MonitorClass = Get-SCOMClass -Id $Monitor.Target.Id
-		$ActiveMonitors = Get-SCOMClassInstance -Class $MonitorClass | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) }
-		write-host "Found" + $ActiveMonitors.Count + "active monitors."
-		if ( $ActiveMonitors -ne $null)
-			{
-			foreach ($ActiveMonitor in $ActiveMonitors)
-				{
-				write-host " Resetting Health State on '" +$ActiveMonitor.FullName + "'" 
-				$ActiveMonitor.ResetMonitoringState($Monitor.ID)
-				}
-			}
-		}
-	}
-
-$ActiveMonitors.Count
+# Open/Closed breakout
+$OpenADDSAlerts = $SCOMCoreReportAlerts
+$OpenADDSAlerts.Count
+$ClosedADDSAlerts = Get-SCOMAlert -ResolutionState 255 | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
+$ClosedADDSAlerts.Count
 
 #============================================================
 
@@ -1810,12 +1806,11 @@ $ActiveMonitors.Count
 
 
 # Build report
+#============================================================
 $MECMTeamCleanup = @()
 
-
 # Check for alerts 
-#if ( $MECMServerAlerts.Count -eq 0 )
-if ( $ActiveMonitors.Count -eq 0 )
+if ( $SCOMCoreReportAlerts.Count -eq 0 )
 	{
 	$Message = "ZERO alerts for MECM Team Daily Cleanup for ($date)"
 	$MECMTeamCleanup += "ZERO alerts for MECM Team Daily Cleanup for ($date)"
@@ -1825,11 +1820,10 @@ if ( $ActiveMonitors.Count -eq 0 )
 
 # $MECMReportMonitorsToClose or $ActiveMonitors ?
 #==================================================
-#if ( $MECMServerAlerts.Count -gt 0 )
-if ( $ActiveMonitors.Count -gt 0 )
+if ( $SCOMCoreReportAlerts.Count -gt 0 )
 	{
 	#
-	# Create table output	
+	# Create table output
 
 	#
 	# Show MECM alerts by Time Raised,NetBiosComputerName,Message
@@ -1842,7 +1836,7 @@ if ( $ActiveMonitors.Count -gt 0 )
 	$MECMTeamCleanup += "Reset $($ActiveMonitors.Count) unhealthy monitors"
 	$MECMTeamCleanup += "#"
 	}
-	
+
 $MECMTeamCleanup
 
 
@@ -1850,7 +1844,7 @@ $MECMTeamCleanup
 $momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamCleanup")
 
 #$bag.AddValue('Result',$Result)
-$bag.AddValue('Count',$Test)
+$bag.AddValue('Count',$SCOMCoreReportAlerts.Count)
 $bag.AddValue('Message',$Message)
 $bag.AddValue('Summary',$MECMTeamCleanup)
 
@@ -1860,20 +1854,112 @@ $bag
 
 $ReportTime = Get-Date
 $ScriptTime = ($ReportTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 
+
+# Debug Write event for rule closure
+#=================================================================================
+# $UnhealthyMonitors = $($UnhealthyMonitors | measure-object -sum).sum
+#$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive MECM monitors auto-closed on ($date).")
+# Write event for rule closure
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks MECM monitor reset completed for ($date)")
+
+$SCOMCoreRulesToClear = $SCOMCoreRuleAlerts | where { ( $_.TimeAdded -lt $Age ) }
+# Convert Age back to days for alert properties logging
+$Days = ((Get-date) - $Age).Days
+if ( $SCOMCoreRulesToClear.Count -gt 0 )
+	{
+	$SCOMCoreRulesToClear | Resolve-SCOMAlert -Comment "Closing $Days day old alerts after report alert generated - MECM SCCM Addendum Automation DS"
+	}
+
+# Write event for rule closure
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM SCCM addendum automation rule reset completed for ($date)")
+
+
+#=================================================================================
+# Reset Monitors Script base code modified
+# Put ps1 in mgmtpacks folder
+# https://sc.scomurr.com/scom-2012-monitor-reset-cleaning-up-the-environment/
+#	Download
+# https://gallery.technet.microsoft.com/SCOM-2012-Batch-reset-63a17534
+	
+#Alternate
+#https://gallery.technet.microsoft.com/scriptcenter/Auto-reset-script-for-d8b775ca
+
+# Changed up logic to sort unique classes in mgmnt pack families.
+# Added Age variable for monitors thanks to Aris Somatis - $Age specified in top level variables
+# Cycling through monitors made reset loop huge ~650 monitors when only ~50 classes
+# New logic reduced runtime from 8 minutes to roughly 8 seconds
+#=================================================================================
+
+# Write event for rule closure
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks ADDS Monitors reset started for ($date).")
+
+
+if ( $SCOMCoreReportAlerts.Count -gt 0 )
+	{
+	# Get MECM SCCM classes
+		$MECMLibrary = Get-SCOMManagementPack -name "Microsoft.SystemCenter2012.ConfigurationManager.Library"
+			#get-scomclass -ManagementPack $MECMLibrary
+		$MECMMonitoring = $SCOMCoreMP
+			#get-scomclass -ManagementPack $MECMMonitoring | fl DisplayName,Name,ID
+		$MECMDiscovery = Get-SCOMManagementPack -DisplayName "Microsoft System Center 2012 Configuration Manager Discovery"
+			#get-scomclass -ManagementPack $MECMDiscovery | fl DisplayName,Name,ID
+
+	# MECM pack naming
+	$MECMClasses = @(Get-SCOMClass -ManagementPack $MECMLibrary; Get-SCOMClass -ManagementPack $MECMDiscovery; )
+	$MECMClass = $MECMClasses | sort -property Name -uniq
+	# Debug
+	$MECMClass.Count
+
+	# Set up monitor objects to reset
+	foreach ($Class in $MECMClass)
+		{
+		$ActiveMonitors = @(Get-SCOMClassInstance -Class $Class | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) } )
+		# Debug
+		$ActiveMonitors.Count
+		# $ActiveMonitors | fl -property *
+		write-host "Found" $ActiveMonitors.Count "unhealthy monitors for class" $Class
+		foreach ( $UnhealthyOLDMonitor in $ActiveMonitors )
+			{
+			#if ( $UnhealthyOLDMonitor.AvailabilityLastModified -lt $Age )
+			if ( $UnhealthyOLDMonitor.StateLastModified -lt $Age )
+				{
+				#$UnhealthyMonitors += $ActiveMonitors.Count
+				#UnhealthyOLDMonitor | select AvailabilityLastModified,Path,DisplayName
+				#$UnhealthyOLDMonitor.Count
+				#write-host "Found" + $UnhealthyOLDMonitor.Count + "unhealthy monitor beyond" $Age "days."
+				#write-host ""
+				if ( $ActiveMonitors.Count -gt 0)
+					{
+					foreach ( $ActiveMonitor in $UnhealthyOLDMonitor )
+						{
+						# Debug
+						$ActiveMonitor.ID
+						write-host " Resetting Health State on '" + $ActiveMonitor.FullName + "'" 
+						write-host ""
+						$ActiveMonitor.ResetMonitoringState($ActiveMonitor)
+						}
+					}
+				}
+			}
+		}
+	# Debug
+	#$MonitorClass | fl -property *
+	#$MonitorClass | select DisplayName,ID
+	}
 
 
 #=================================================================================
 # End MAIN script section
 
-  
+
 # End of script section
 #=================================================================================
 #Log an event for script ending and total execution time.
 $EndTime = Get-Date
 $ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 #=================================================================================
 # End of script
                 </ScriptBody>
@@ -1901,7 +1987,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
           <Composite>
             <MemberModules>
               <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.WA.v1025.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.WA.v1028.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  SCCM MECM Client cache cleanup and C: drive cleanup
@@ -1921,8 +2007,8 @@ param([string]$DriveLetter,[string]$ComputerName)
 
 # Constants section - modify stuff here:
 #=================================================================================
-# Assign script name variable for use in event logging.  
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1025.ps1"
+# Assign script name variable for use in event logging.
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1028.ps1"
 $EventID = "680"
 #=================================================================================
 
@@ -1939,19 +2025,19 @@ $momapi = New-Object -comObject MOM.ScriptAPI
 $bag = $momapi.CreatePropertyBag()
 
 #Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
 #=================================================================================
 
 
 # Begin MAIN script section
 #=================================================================================
 #Log script parameters we received
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`nScript parameters passed into datasource: `nDriveLetter: ($DriveLetter). `nComputerName: ($ComputerName).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script parameters passed into datasource: `nDriveLetter: ($DriveLetter). `nComputerName: ($ComputerName).")
 
 #For a simple example - get files in Windows Temp:
 $date = get-date -uFormat "%Y-%m-%d"
 
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Gather Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alert report for date ($date).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Gather Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alert report for date ($date).")
 
 $DSMessage = "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for date ($date)."
 
@@ -1981,7 +2067,7 @@ If ($DiskFreeSpace.FreeSpace -gt 15 )
 	$strCondition = "Good"
 	$end
 	}
- 
+
 If ($DiskFreeSpace.FreeSpace -lt 15 )
 	{
 	#Set the condition = bad.  This represents your script finding something wrong
@@ -1991,13 +2077,13 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 	$resman= New-Object -ComObject "UIResource.UIResourceMgr"
 	$cacheInfo=$resman.GetCacheInfo()
 	$cacheinfo.GetCacheElements()  | foreach {$cacheInfo.DeleteCacheElement($_.CacheElementID)}
-	
+
 	# get-volume
 	#=====================
 	# $DriveLetter = "C"
 	$ExpandC = get-volume
 	$ExpandAction = $ExpandC | ? { ( $_.SizeRemaining -gt "0" ) -AND ( $_.Driveletter -eq "$DriveLetter" ) }
-	
+
 	if ( $ExpandAction.DriveLetter -eq $true)
 		{
 		$momapi.LogScriptEvent($ScriptName,$EventID,0,"Expand drive via Disk Manager on ($ComputerName)")
@@ -2024,6 +2110,8 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
  
 	$DiskFreeSpace
  
+	$DriveLetter = $CFreeSpace.DeviceID
+ 
  
 	# Check for large profile sizes
 	#==================================
@@ -2036,12 +2124,12 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 	#foreach ($Profile in $Profiles)
 		#{
 		#$Profile
-		#$Size = (gci $DriveLetter:\users\$Profile -recurse| measure length -s).sum
-		$Size = (gci $DriveLetter:\users -recurse| measure length -s).sum
+		#$Size = (gci $DriveLetter\users\$Profile -recurse| measure length -s).sum
+		$Size = (gci $DriveLetter\users -recurse| measure length -s).sum
 	 
 		$ProfileTableObject += [pscustomobject]@{
 		#AccountID = $Profile
-		UserDirectory = "$DriveLetter:\Users"
+		UserDirectory = "C:\Users"
 		SizeGB = [math]::Round($Size/1GB,2)
 	      }
 	#}
@@ -2050,8 +2138,8 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
  
 	# Check C Drive folder size
 	#==========================
-	#$CheckCDriveFolders = (gci $DriveLetter:\).Name | ? { ( $_ -ne "Users" ) -AND ( $_ -ne "Windows" )  }
-	$CheckCDriveFolders = (gci $DriveLetter:\).Name | ? { ( $_ -ne "Users" ) }
+	#$CheckCDriveFolders = (gci C:\).Name | ? { ( $_ -ne "Users" ) -AND ( $_ -ne "Windows" )  }
+	$CheckCDriveFolders = (gci $DriveLetter\).Name | ? { ( $_ -ne "Users" ) }
 	$CheckCDriveFolders
  
 	$Cfolders = @()
@@ -2059,7 +2147,7 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 	Foreach ( $folder in $CheckCDriveFolders )
 		{
 		#$folder
-		$Size = (Get-ChildItem "$DriveLetter:\$folder" -Recurse | Measure-Object -Property Length -Sum ).sum
+		$Size = (Get-ChildItem "$DriveLetter\$folder" -Recurse | Measure-Object -Property Length -Sum ).sum
 		#$Size
 		$CFolders += [pscustomobject]@{
 			Directory = $folder
@@ -2080,7 +2168,7 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 		{
 		Write-host "NO MECM\SCCM Action required"
 		}
-		 
+
 	If ( $SoftwareDistribution -gt "3000" )
 		{
 		Write-host "MECM\SCCM Action required, stopping Windows Update service, removing SoftwareDIstribution folder and restarting"
@@ -2090,7 +2178,7 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 		Write-host "Windows Update wuauserv service restarted after SoftwareDistribution directory removed"
 		}
 
- 
+
 	# Summary Report
 	#==================================
 	$ProfileTableOutput = $ProfileTableObject | sort -property SizeGB -desc | out-string
@@ -2121,7 +2209,7 @@ If ($DiskFreeSpace.FreeSpace -lt 15 )
 	$SCCMClientCacheReport += "#===================================="
 	$SCCMClientCacheReport += ""
 	}
-	
+
 $SCCMClientCacheReport
 
 $SCCMClientCacheReport = $SCCMClientCacheReport | out-string
@@ -2130,16 +2218,16 @@ $SCCMClientCacheReport = $SCCMClientCacheReport | out-string
 
 #Check the value of $strCondition
 IF ($strCondition -eq "Good")
-{
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"NO MECM SCCM Team action required")
-  $bag.AddValue('Result',$strCondition)
-}
+	{
+	$momapi.LogScriptEvent($ScriptName,$EventID,0,"NO MECM SCCM Team action required")
+	$bag.AddValue('Result',$strCondition)
+	}
 IF ($strCondition -eq "Bad")
-{
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"$SCCMClientCacheReport")
-  $bag.AddValue('Result',$strCondition)
+	{
+	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$SCCMClientCacheReport")
+	$bag.AddValue('Result',$strCondition)
 	$bag.AddValue('Summary',$SCCMClientCacheReport)
-}
+	}
 
 # Return all bags
 $bag
@@ -2152,7 +2240,342 @@ $bag
 #Log an event for script ending and total execution time.
 $EndTime = Get-Date
 $ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+#=================================================================================
+# End of script
+                </ScriptBody>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSWA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.BaseData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+      <WriteActionModuleType ID="Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1028.ps1</ScriptName>
+                <ScriptBody>
+#=================================================================================
+#  Script to gather MECM cache cleanup alerts for team daily report
+#
+#  Author: Kevin Justin
+#  v1.0
+#=================================================================================
+
+
+# Constants section - modify stuff here:
+#=================================================================================
+# Assign script name variable for use in event logging.
+# ScriptName should be the same as the ID of the module that the script is contained in
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1028.ps1"
+$EventID = "681"
+#=================================================================================
+
+
+# Starting Script section - All scripts get this
+#=================================================================================
+# Gather the start time of the script
+$StartTime = Get-Date
+#Set variable to be used in logging events
+$whoami = whoami
+# Load MOMScript API
+$momapi = New-Object -comObject MOM.ScriptAPI
+#Log script event that we are starting task
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
+#=================================================================================
+
+
+# PropertyBag Script section - Monitoring scripts get this
+#=================================================================================
+# Load SCOM PropertyBag function
+$bag = $momapi.CreatePropertyBag()
+#=================================================================================
+
+
+# Begin MAIN script section
+#=================================================================================
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Gather Proactive MECM Client Cache Cleanup Alerts for date ($date).")
+
+#For a simple example - get files in Windows Temp:
+$date = get-date -uFormat "%Y-%m-%d"
+$Age = [DateTime](Get-Date).AddDays(-1)
+
+# Grab past 24 hours
+if ( (get-date).DayOfWeek -ne "Monday" )
+	{
+	$Time = [DateTime](Get-Date).AddDays(-1)
+	}
+if ( (get-date).DayOfWeek -eq "Monday" )
+	{
+	$Time = [DateTime](Get-Date).AddDays(-3)
+	}
+
+
+# Gather MECM alerts
+# Monitors then rules
+$MECMClientCacheAlerts = get-scomalert | ? { ( $_.Name -like "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for date*" ) `
+	-OR ( $_.Name -like "Expand drive via Disk Manager on*" ) `
+	}  | ? { ( $_.TimeRaised -ge $Time ) }
+
+
+#$MECMReportAlerts
+#$MECMClientCacheAlerts.Count
+
+# Open MECM server alerts
+$MECMOpenAlerts = $MECMClientCacheAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
+#$MECMOpenAlerts.Count
+
+# Closed MECM server alerts
+$MECMClosedAlerts = $MECMClientCacheAlerts | ? { ( $_.ResolutionState -eq "255" ) }
+#$MECMClosedAlerts.Count
+
+
+# Client Cache cleanup alerts
+$MECMCacheCleanupAlerts = $MECMClientCacheAlerts | ? { ( $_.Name -like "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for date*" ) }
+#$MECMCacheCleanupAlerts.Count
+
+# Open alerts
+$OpenMECMCacheCleanupAlerts = $MECMCacheCleanupAlerts | ? { ( $_.ResolutionState -ne "255" ) }
+#$OpenMECMCacheCleanupAlerts.Count
+
+# Closed alerts
+$ClosedMECMCacheCleanupAlerts = $MECMCacheCleanupAlerts | ? { ( $_.ResolutionState -eq "255" ) }
+#$ClosedMECMCacheCleanupAlerts.Count
+
+
+# Expand drives via disk manager server alerts
+$MECMExpandDriveAlerts = $MECMClientCacheAlerts | ? { ( $_.Name -like "Expand drive via Disk Manager on*" ) }
+#$MECMExpandDriveAlerts.Count
+
+# Open MECM server alerts
+$OpenMECMExpandDriveAlerts = $MECMExpandDriveAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
+#$OpenMECMExpandDriveAlerts.Count
+
+# Closed MECM server alerts
+$ClosedMECMExpandDriveAlerts = $MECMExpandDriveAlerts | ? { ( $_.ResolutionState -eq "255" ) }
+#$ClosedMECMExpandDriveAlerts.Count
+
+
+# Build report
+$MECMTeamReport = @()
+
+
+# Check for alerts 
+if ( $MECMClientCacheAlerts.Count -eq 0 )
+	{
+	$Message = "ZERO alerts for Proactive MECM Client Cache Cleanup Alerts for ($date)"
+	$MECMTeamReport += "ZERO alerts for Proactive MECM Client Cache Cleanup Alerts for ($date)"
+	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$Message")
+	}
+
+if ( $MECMClientCacheAlerts.Count -gt 0 )
+	{
+	#
+	# Create table output
+
+	#
+	# Show MECM alerts by Time Raised,NetBiosComputerName,Message
+	#
+	$MECMTeamReport += ""
+	$MECMTeamReport += "# Proactive MECM Client Cache Cleanup Alerts for $($date)"
+	$MECMTeamReport += "#"
+	$MECMTeamReport += "#"
+	$MECMTeamReport += "# NEW Alerts since last run = $($MECMClientCacheAlerts.Count)"
+	$MECMTeamReport += ""
+	$MECMTeamReport += "#========================================================"
+	$MECMTeamReport += "# Open MECM Client Cache alerts = $($OpenMECMCacheCleanupAlerts.Count)"
+	$MECMTeamReport += "# Open MECM Client Cache alerts = $($OpenMECMExpandDriveAlerts.Count)"
+	$MECMTeamReport += "#========================================================"
+	$MECMTeamReport += ""
+	$MECMTeamReport += ""
+	$MECMTeamReport += "#========================================================"
+	$MECMTeamReport += "# CLOSED MECM Client Cache alerts = $($ClosedMECMCacheCleanupAlerts.Count)"
+	$MECMTeamReport += "# CLOSED MECM Expand Drive alerts = $($ClosedMECMExpandDriveAlerts.Count)"
+	$MECMTeamReport += "#========================================================"
+	$MECMTeamReport += ""
+
+	# Add logic for alert detail
+
+	$MECMTeamReport += ""
+	$MECMTeamReport += "# OPEN Alert details"
+	$MECMTeamReport += "#==============================="
+	$MECMTeamReport += ""
+
+ 	if ( $OpenMECMCacheCleanupAlerts.Count -eq 0 )
+		{
+		$MECMTeamReport += "ZERO Open MECM Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for ($date)."
+		$MECMTeamReport += ""
+		}
+		
+	if ( $OpenMECMCacheCleanupAlerts.Count -gt 0 )
+		{
+		$MECMTeamReport += "#"
+		$MECMTeamReport += "# Open MECM SCCM ConfigMgr Client Cache Cleanup Alert details"
+		$MECMTeamReport += "#=============================="
+		$MECMTeamReport += $OpenMECMCacheCleanupAlerts | out-string
+		$MECMTeamReport += "#============================================================"
+		$MECMTeamReport += ""
+		}
+
+
+ 	if ( $OpenMECMExpandDriveAlerts.Count -eq 0 )
+		{
+		$MECMTeamReport += "ZERO Open MECM Proactive Expand drive via Disk Manager Alerts for ($date)."
+		$MECMTeamReport += ""
+		}
+
+	if ( $OpenMECMExpandDriveAlerts.Count -gt 0 )
+		{
+		$MECMTeamReport += "#"
+		$MECMTeamReport += "# Open Expand drive via Disk Manager Alert details"
+		$MECMTeamReport += "#=============================="
+		$MECMTeamReport += $OpenMECMExpandDriveAlerts | out-string
+		$MECMTeamReport += "#============================================================"
+		$MECMTeamReport += ""
+		}
+
+	$MECMTeamReport += ""
+	$MECMTeamReport += "# CLOSED Alert details"
+	$MECMTeamReport += "#==============================="
+	$MECMTeamReport += ""
+
+ 	if ( $ClosedMECMCacheCleanupAlerts.Count -eq 0 )
+		{
+		$MECMTeamReport += "ZERO Closed MECM Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for ($date)."
+		$MECMTeamReport += ""
+		}
+		
+	if ( $ClosedMECMCacheCleanupAlerts.Count -gt 0 )
+		{
+		$MECMTeamReport += "#"
+		$MECMTeamReport += "# Closed MECM SCCM ConfigMgr Client Cache Cleanup Alert details"
+		$MECMTeamReport += "#=============================="
+		$MECMTeamReport += $ClosedMECMCacheCleanupAlerts | out-string
+		$MECMTeamReport += "#============================================================"
+		$MECMTeamReport += ""
+		}
+
+
+ 	if ( $ClosedMECMExpandDriveAlerts.Count -eq 0 )
+		{
+		$MECMTeamReport += "ZERO Closed MECM Proactive Expand drive via Disk Manager Alerts for ($date)."
+		$MECMTeamReport += ""
+		}
+
+	if ( $OpenMECMExpandDriveAlerts.Count -gt 0 )
+		{
+		$MECMTeamReport += "#"
+		$MECMTeamReport += "# Closed Expand drive via Disk Manager Alert details"
+		$MECMTeamReport += "#=============================="
+		$MECMTeamReport += $ClosedMECMExpandDriveAlerts | out-string
+		$MECMTeamReport += "#============================================================"
+		$MECMTeamReport += ""
+		}
+	}
+
+#$MECMTeamReport
+
+$MECMTeamReport = $MECMTeamReport | out-string
+
+#============================================================
+
+$Result = "GOOD"
+$Message = "Proactive MECM Client Cache Cleanup Alerts for ($date)"
+$MECMTeamReport
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
+
+#$bag.AddValue('Result',$Result)
+$bag.AddValue('Count',$Test)
+$bag.AddValue('Message',$Message)
+$bag.AddValue('Summary',$MECMTeamReport)
+
+
+# Return all bags
+$bag
+
+$ReportTime = Get-Date
+$ScriptTime = ($ReportTime - $StartTime).TotalSeconds
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM Cache Cleanup Report Completed. `n Script Runtime: ($ScriptTime) seconds.")
+
+
+#
+# If Cleanup needed, array of report monitors
+
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM Client Cache monitor cleanup for ($date).")
+
+$MECMReportMonitorsToClose = @()
+
+$MECMReportMonitorsToClose += "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Monitor"
+
+
+# Reset open monitors
+if ( $MECMOpenAlerts.Count -gt 0 )
+	{
+	foreach ( $MonitorDisplayName in $MECMReportMonitorsToClose )
+		{
+		$Monitors = @(Get-SCOMMonitor -displayname $MonitorDisplayName)
+
+		# Set up monitor objects to reset
+		foreach ($Monitor in $Monitors)
+			{
+			$MonitorClass = Get-SCOMClass -Id $Monitor.Target.Id
+			$ActiveMonitors = Get-SCOMClassInstance -Class $MonitorClass | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) }
+			# Debug
+			$ActiveMonitors.Count
+			# $ActiveMonitors | fl -property *
+			#write-host "Found" + $ActiveMonitors.Count + "active monitors of " $Monitor
+			foreach ( $UnhealthyOLDMonitor in $ActiveMonitors )
+				{
+				#if ( $UnhealthyOLDMonitor.AvailabilityLastModified -lt $Age )
+				if ( $UnhealthyOLDMonitor.StateLastModified -lt $Age )
+					{
+					#$UnhealthyMonitors += $ActiveMonitors.Count
+					#UnhealthyOLDMonitor | select AvailabilityLastModified,Path,DisplayName
+					#$UnhealthyOLDMonitor.Count
+					#write-host "Found" + $UnhealthyOLDMonitor.Count + "unhealthy monitor beyond" $Age "days."
+					#write-host ""
+					if ( $ActiveMonitors.Count -gt 0)
+						{
+						foreach ( $ActiveMonitor in $UnhealthyOLDMonitor )
+							{
+							# Debug
+							$ActiveMonitor.ID
+							write-host " Resetting Health State on '" + $ActiveMonitor.FullName + "'" 
+							write-host ""
+							$ActiveMonitor.ResetMonitoringState($ActiveMonitor)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM Client Cache monitor cleanup for ($date).")
+
+#=================================================================================
+# End MAIN script section
+
+
+# End of script section
+#=================================================================================
+#Log an event for script ending and total execution time.
+$EndTime = Get-Date
+$ScriptTime = ($EndTime - $StartTime).TotalSeconds
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 #=================================================================================
 # End of script
                 </ScriptBody>
@@ -2178,7 +2601,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
           <Composite>
             <MemberModules>
               <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Reports.WA.v1025.ps1</ScriptName>
+                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Reports.WA.v1028.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alerts for team daily report
@@ -2190,9 +2613,9 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
 
 # Constants section - modify stuff here:
 #=================================================================================
-# Assign script name variable for use in event logging.  
+# Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1025.ps1"
+$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1028.ps1"
 $EventID = "682"
 #=================================================================================
 
@@ -2206,7 +2629,7 @@ $whoami = whoami
 # Load MOMScript API
 $momapi = New-Object -comObject MOM.ScriptAPI
 #Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
 #=================================================================================
 
 
@@ -2233,12 +2656,12 @@ if ( (get-date).DayOfWeek -eq "Monday" )
 	$Time = [DateTime](Get-Date).AddDays(-3)
 	}
 
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Gather MECM Alerts for date ($date).")
-	
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Gather MECM Alerts for date ($date).")
+
 
 # Gather MECM alerts
 # Monitors then rules
-$MECMReportAlerts = get-scomalert | ? { ( $_.Name -eq "Available Megabytes of Memory is too low" ) `
+$MECMReportAlerts = get-scomalert -ResolutionState (0..254) | ? { ( $_.Name -eq "Available Megabytes of Memory is too low" ) `
 	-OR ( $_.Name -eq "Action Account Not Configured Correctly" ) `
 	-OR ( $_.Name -like "Asset Intelligence*" ) `
 	-OR ( $_.Name -eq "Certificate lifespan alert" ) `
@@ -2274,9 +2697,11 @@ $MECMReportAlerts = get-scomalert | ? { ( $_.Name -eq "Available Megabytes of Me
 	-OR ( $_.Name -eq "Site Roles" ) `
 	-OR ( $_.Name -like "Site Server*" ) `
 	-OR ( $_.Name -eq "SMSExec CPU Usage is Too High" ) `
-	-OR ( $_.Name -eq "Software Update Point Not Available" ) `	
+	-OR ( $_.Name -eq "Software Update Point Not Available" ) `
 	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
 	-OR ( $_.Name -eq "State Migration Point Not Available" ) `
+	-OR ( $_.Name -eq "System Center Management Health Service Unloaded System Rule(s)") `
+	-OR ( $_.Name -eq "System Center Management Health Service Unable to Process New Configuration" ) `
 	-OR ( $_.Name -eq "System summary task failure alert" ) `
 	-OR ( $_.Name -eq "TCP/IP NetBIOS Service Stopped" ) `
 	-OR ( $_.Name -eq "Total CPU Utilization Percentage is too high" ) `
@@ -2291,35 +2716,80 @@ $MECMReportAlerts = get-scomalert | ? { ( $_.Name -eq "Available Megabytes of Me
 
 
 #$MECMReportAlerts
-$MECMReportAlerts.Count
-
+#$MECMReportAlerts.Count
 
 
 # Break out alerts into MECM servers
 $MECMServerAlerts = @()
 
-$MECMServerAlerts = $MECMReportAlerts | ? { ( $_.NetBiosComputerName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.NetBiosComputerName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.NetBiosComputerName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "D*JJ0[1-3]S*" ) `
+$MECMServerAlerts = $MECMReportAlerts | ? { ( $_.NetBiosComputerName -like "*##MECMServerRegEX##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*##MECMServerRegEX##*" ) `
 	}
 
-
-$MECMServerAlerts.Count
+#$MECMServerAlerts.Count
 
 # Open MECM server alerts
 $MECMOpenAlerts = $MECMServerAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
-$MECMOpenAlerts.Count
+#$MECMOpenAlerts.Count
 
 # Open MECM server alerts since last report
 $MECMAlertsSinceReport = $MECMServerAlerts | ? { ( $_.TimeRaised -ge $Time ) }
-$MECMAlertsSinceReport.Count
+#$MECMAlertsSinceReport.Count
 
 # Closed MECM server alerts
-$MECMClosedAlerts = $MECMServerAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$MECMClosedAlerts.Count
+$MECMClosedAlerts = get-scomalert -ResolutionState 255 | ? { ( $_.Name -eq "Available Megabytes of Memory is too low" ) `
+	-OR ( $_.Name -eq "Action Account Not Configured Correctly" ) `
+	-OR ( $_.Name -like "Asset Intelligence*" ) `
+	-OR ( $_.Name -eq "Certificate lifespan alert" ) `
+	-OR ( $_.Name -eq "Component stopped alert" ) `
+	-OR ( $_.Name -eq "Content distribution alert" ) `
+	-OR ( $_.Name -like "DFS-R: *" ) `
+	-OR ( $_.Name -like "DHCP*" ) `
+	-OR ( $_.Name -eq "DHCP Service Stopped" ) `
+	-OR ( $_.Name -eq "Distribution fails to access network alert" ) `
+	-OR ( $_.Name -eq "DNS Client Service Stopped" ) `
+	-OR ( $_.Name -eq "Event log is full" ) `
+	-OR ( $_.Name -eq "Fail to access site system alert" ) `
+	-OR ( $_.Name -eq "Fail to read Active Directory alert" ) `
+	-OR ( $_.Name -eq "Fail to update Active Directory alert" ) `
+	-OR ( $_.Name -eq "Failed to Connect to Computer" ) `
+	-OR ( $_.Name -eq "Failed to install application on client" ) `
+	-OR ( $_.Name -eq "File Dispatch Manager Not Connecting to Site Server" ) `
+	-OR ( $_.Name -eq "Health Service Heartbeat Failure" ) `
+	-OR ( $_.Name -eq "Logical disk current queue length is too high" ) `
+	-OR ( $_.Name -eq "Logical Disk Free Space is low" ) `
+	-OR ( $_.Name -like "Logical disk transfer*" ) `
+	-OR ( $_.Name -eq "Maintenance task failure alert" ) `
+	-OR ( $_.Name -like "Management point*" ) `
+	-OR ( $_.Name -eq "Max Concurrent API Reached alert" ) `
+	-OR ( $_.Name -eq "Memory Pages Per Second is too High." ) `
+	-OR ( $_.Name -eq "Microsoft Windows Server AD PasswordCheck Script Alert Rule" ) `
+	-OR ( $_.Name -like "MSSQL*" ) `
+	-OR ( $_.Name -eq "NTFS reported the logical disk is in error or corrupt." ) `
+	-OR ( $_.Name -eq "Percentage of Committed Memory in Use is too high" ) `
+	-OR ( $_.Name -like "PROACTIVE -*" ) `
+	-OR ( $_.Name -eq "Run As Account Could Not Log On" ) `
+	-OR ( $_.Name -like "Site Component*" ) `
+	-OR ( $_.Name -eq "Site Roles" ) `
+	-OR ( $_.Name -like "Site Server*" ) `
+	-OR ( $_.Name -eq "SMSExec CPU Usage is Too High" ) `
+	-OR ( $_.Name -eq "Software Update Point Not Available" ) `
+	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
+	-OR ( $_.Name -eq "State Migration Point Not Available" ) `
+	-OR ( $_.Name -eq "System Center Management Health Service Unloaded System Rule(s)") `
+	-OR ( $_.Name -eq "System Center Management Health Service Unable to Process New Configuration" ) `
+	-OR ( $_.Name -eq "System summary task failure alert" ) `
+	-OR ( $_.Name -eq "TCP/IP NetBIOS Service Stopped" ) `
+	-OR ( $_.Name -eq "Total CPU Utilization Percentage is too high" ) `
+	-OR ( $_.Name -eq "VMware (High): Virtual Machine CPU Usage is High" ) `
+	-OR ( $_.Name -eq "Windows Event Log Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Firewall Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Remote Management Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Server Service Stopped" ) `
+	-OR ( $_.Name -eq "Windows Storport Miniport Driver has timed out a request" ) `
+	-OR ( $_.Name -eq "WSUS Synchronization Failed" ) `
+	}
+#$MECMClosedAlerts.Count
 
 
 #
@@ -2337,16 +2807,29 @@ $MECMAppAlerts = $MECMServerAlerts | ? { ( $_.Name -eq "Component stopped alert"
 	-OR ( $_.Name -like "Site server*" ) `
 	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
 	-OR ( $_.Name -eq "WSUS Synchronization Failed" ) `
-	} 
+	}
 	# | ? { $_.TimeRaised -gt $Time }
 
-$MECMAppAlerts.Count
+#$MECMAppAlerts.Count
 
-$OpenMECMAppAlerts = $MECMAppAlerts | ? { ( $_.ResolutionState -ne "255" ) }
-$OpenMECMAppAlerts.Count
+$OpenMECMAppAlerts = $MECMAppAlerts
+#$OpenMECMAppAlerts.Count
 
-$ClosedMECMAppAlerts = $MECMAppAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$ClosedMECMAppAlerts.Count
+$ClosedMECMAppAlerts = $MECMClosedAlerts | ? { ( $_.Name -eq "Component stopped alert" ) `
+	-OR ( $_.Name -eq "Content distribution alert" ) `
+	-OR ( $_.Name -eq "Distribution fails to access network alert" ) `
+	-OR ( $_.Name -eq "Fail to read Active Directory alert" ) `
+	-OR ( $_.Name -eq "Fail to update Active Directory alert" ) `
+	-OR ( $_.Name -eq "File Dispatch Manager Not Connecting to Site Server" ) `
+	-OR ( $_.Name -eq "Maintenance task failure alert" ) `
+	-OR ( $_.Name -like "Management point*" ) `
+	-OR ( $_.Name -eq "MSSQL on Windows: Filegroup is running out of space" ) `
+	-OR ( $_.Name -eq "MSSQL on Windows: Database ROWS Data is Out of Space" ) `
+	-OR ( $_.Name -like "Site server*" ) `
+	-OR ( $_.Name -eq "SQL Server Port Not Correct." ) `
+	-OR ( $_.Name -eq "WSUS Synchronization Failed" ) `
+	}
+#$ClosedMECMAppAlerts.Count
 
 
 
@@ -2356,18 +2839,17 @@ $ClosedMECMAppAlerts.Count
 #
 # PROACTIVE - Server restart pending detected
 $PendingRestart = $MECMServerAlerts | ? { ( $_.Name -eq "PROACTIVE - Server restart pending detected" ) `
-	} 
+	}
 	#| ? { $_.TimeRaised -gt $Time }
 
-$PendingRestart.Count
-
-$OpenPendingRestart = $PendingRestart | ? { $_.ResolutionState -ne "255" }
-$OpenPendingRestart.Count
-
-$ClosedPendingRestart = $PendingRestart | ? { $_.ResolutionState -eq "255" }
-$ClosedPendingRestart.Count
-
+#$PendingRestart.Count
 $PendingRestart = $PendingRestart | ft NetbiosComputerName,TimeRaised -auto -wrap
+
+$OpenPendingRestart = $PendingRestart
+#$OpenPendingRestart.Count
+
+$ClosedPendingRestart = $MECMClosedAlerts | ? { ( $_.Name -eq "PROACTIVE - Server restart pending detected" ) }
+#$ClosedPendingRestart.Count
 
 
 #
@@ -2375,15 +2857,14 @@ $PendingRestart = $PendingRestart | ft NetbiosComputerName,TimeRaised -auto -wra
 $NotRebooted = $MECMServerAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT rebooted in past month" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$NotRebooted.Count
-
-$OpenNotRebooted = $NotRebooted | ? { $_.ResolutionState -ne "255" }
-$OpenNotRebooted.Count
-
-$ClosedNotRebooted = $NotRebooted | ? { $_.ResolutionState -eq "255" }
-$ClosedNotRebooted.Count
-
+#$NotRebooted.Count
 $NotRebooted = $NotRebooted | ft NetbiosComputerName,TimeRaised -auto -wrap
+
+$OpenNotRebooted = $NotRebooted
+#$OpenNotRebooted.Count
+
+$ClosedNotRebooted = $MECMClosedAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT rebooted in past month" ) }
+#$ClosedNotRebooted.Count
 
 
 #
@@ -2391,15 +2872,14 @@ $NotRebooted = $NotRebooted | ft NetbiosComputerName,TimeRaised -auto -wrap
 $NotPatched = $MECMServerAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT patched in past month" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$NotPatched.Count
-
-$OpenNotPatched = $NotPatched | ? { $_.ResolutionState -ne "255" }
-$OpenNotPatched.Count
-
-$ClosedNotPatched = $NotPatched | ? { $_.ResolutionState -eq "255" }
-$ClosedNotPatched.Count
-
+#$NotPatched.Count
 $NotPatched = $NotPatched | ft NetbiosComputerName,TimeRaised -auto -wrap
+
+$OpenNotPatched = $NotPatched
+#$OpenNotPatched.Count
+
+$ClosedNotPatched = $MECMClosedAlerts | ? { ( $_.Name -eq "PROACTIVE - Server NOT patched in past month" ) }
+#$ClosedNotPatched.Count
 
 
 #
@@ -2407,7 +2887,7 @@ $NotPatched = $NotPatched | ft NetbiosComputerName,TimeRaised -auto -wrap
 $FailedAppInstall = $MECMReportAlerts | ? { ( $_.Name -eq "Failed to install application on client" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 	
-$FailedAppInstall.Count
+#$FailedAppInstall.Count
 
 
 #
@@ -2421,15 +2901,21 @@ $HighAlerts = $MECMServerAlerts | ? { ( $_.Name -eq "Percentage of Committed Mem
 	-OR ( $_.Name -like "Logical disk transfer*" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$HighAlerts.Count
+#$HighAlerts.Count
 #$HighAlerts = $HighAlerts | ft NetBiosComputerName,TimeRaised,Name -auto
 
-$OpenHighAlerts = $HighAlerts | ? { $_.ResolutionState -ne "255" }
-$OpenHighAlerts.Count
+$OpenHighAlerts = $HighAlerts
+#$OpenHighAlerts.Count
 
-
-$ClosedHighAlerts = $HighAlerts | ? { $_.ResolutionState -eq "255" }
-$ClosedHighAlerts.Count
+$ClosedHighAlerts = $MECMClosedAlerts | ? { ( $_.Name -eq "Percentage of Committed Memory in Use is too high" ) `
+	-OR ( $_.Name -eq "Total CPU Utilization Percentage is too high" ) `
+	-OR ( $_.Name -eq "VMware (High): Virtual Machine CPU Usage is High" ) `
+	-OR ( $_.Name -eq "The LSASS process has exceeded the processor utilization threshold over multiple samples." ) `
+	-OR ( $_.Name -eq "SMSExec CPU Usage is Too High" ) `
+	-OR ( $_.Name -eq "Memory Pages Per Second is too High." ) `
+	-OR ( $_.Name -like "Logical disk transfer*" ) `
+	}
+#$ClosedHighAlerts.Count
 
 
 #
@@ -2438,58 +2924,55 @@ $ActionAccountAlerts = $MECMServerAlerts | ? { ( $_.Name -eq "Action Account Not
 	-OR ( $_.Name -eq "Run As Account Could Not Log On" ) `
 	} | ? { $_.TimeRaised -gt $Time }
 
-$ActionAccountAlerts.Count
+#$ActionAccountAlerts.Count
 
-$OpenActionAccountAlerts = $ActionAccountAlerts | ? { $_.ResolutionState -ne "255" }
-$OpenActionAccountAlerts.Count
+$OpenActionAccountAlerts = $ActionAccountAlerts
+#$OpenActionAccountAlerts.Count
 
-$ClosedActionAccountAlerts = $ActionAccountAlerts | ? { $_.ResolutionState -eq "255" }
-$ClosedActionAccountAlerts.Count
-	
+$ClosedActionAccountAlerts = $MECMClosedAlerts | ? { ( $_.Name -eq  "Action Account Not Configured Correctly" ) `
+	-OR ( $_.Name -eq "Run As Account Could Not Log On" ) `
+	}
+#$ClosedActionAccountAlerts.Count
+
 #
 # Test totals of alerts
 $Test = $MECMServerAlerts.count + $FailedAppInstall.Count
-$Test
+#$Test
 
 
 
 # 
 # Unhealthy/Maintenance mode agents
-# 
-  # Gather Details section
-  # $Details = get-scomagent | ? { $_.HealthState -ne "Success" } |ft DisplayName| out-string
-  $Details
+#
+# Gather Details section
+# $Details = get-scomagent | ? { $_.HealthState -ne "Success" } |ft DisplayName| out-string
+#$Details
+
+$Class = (get-scomclass -Name "Microsoft.Windows.Computer" )
+$instance = ( $Class | ? { $_.Name -like "Microsoft.Windows.Computer" }  |Get-SCOMClassInstance )
   
-  $Class = (get-scomclass -Name "Microsoft.Windows.Computer" )
-  $instance = ( $Class | ? { $_.Name -like "Microsoft.Windows.Computer" }  |Get-SCOMClassInstance )
-  
-  $MM = ($Instance | ? { $_.InMaintenanceMode -eq "True" }).DisplayName `
-	| ? { ( $_.DisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.DisplayName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.DisplayName -like "[1DHSW][26CVPF]*" ) `
+ $MM = ($Instance | ? { $_.InMaintenanceMode -eq "True" }).DisplayName `
+	| ? { ( $_.DisplayName -like "*##MECMServerRegEX##*" ) `
 	}
-	write-host "MM Maintenance mode Agents `n" ; $Unhealthy.InputObject
+	#write-host "MM Maintenance mode Agents `n" ; $Unhealthy.InputObject
     $MaintM = $MM | sort | out-string
 
 
 #  $UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).DisplayName `
 $UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).DisplayName `
-	| ? { ( $_.DisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.DisplayName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.DisplayName -like "[1DHSW][26CVPF]*" ) `
+	| ? { ( $_.DisplayName -like "*##MECMServerRegEX##*" ) `
 	}
 
- if ( $MM.Count -gt 0 )
+if ( $MM.Count -gt 0 )
 	{
 	$CompareMM = compare-object -ReferenceObject $MM -DifferenceObject $UnhealthyAgents
 	}
 
 
-
   #foreach ( $server in $UnHealthyAgents )
 	#{
-	#if ( ! $($MaintM | select-string $server) -eq $True ) 
-		#{ 
+	#if ( ! $($MaintM | select-string $server) -eq $True )
+		#{
 		#write-host $server "is in Maintenance"
 		#$Unhealthy += "$server"
 		#}
@@ -2497,28 +2980,23 @@ $UnHealthyAgents = ( get-scomagent | ? { $_.HealthState -ne "Success" } ).Displa
 
   #$Unhealthy
   #$Details = $Unhealthy.InputObject
-  
-  
+
+
 #$MECMReportAlerts
-#$DownAgents = get-SCOMAlert | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
+#$DownAgents = get-SCOMAlert -ResolutionState (0..254) | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
 # If you want to know alerts for all Down, don't use $MECMReportAlerts (has $Time built in)
 #  $DownAgents = $MECMReportAlerts | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
 $DownAgents = get-SCOMAlert | ? { ($_.Name -eq "Health Service Heartbeat Failure") `
 	-OR ( $_.Name -eq "Failed to Connect to Computer" ) `
 	-OR ( $_.Name -eq "System Center Management Health Service Unloaded System Rule(s)") `
 	-OR ( $_.Name -eq "System Center Management Health Service Unable to Process New Configuration" ) `
-	}   | ? { $_.ResolutionState -ne "255"} `
-	| ? { ( $_.NetBiosComputerName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.NetBiosComputerName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.NetBiosComputerName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "[1DHSW][26CVPF]*" ) `
-	-OR ( $_.MonitoringObjectDisplayName -like "D*JJ0[1-3]S*" ) `
+	} | ? { ( $_.NetBiosComputerName -like "*##MECMServerRegEX##*" ) `
+	-OR ( $_.MonitoringObjectDisplayName -like "*##MECMServerRegEX##*" ) `
 	}
-	
- 
-  #$DownAgents
-  #$DownAgents.count
+
+
+#$DownAgents
+#$DownAgents.count
 
 
 if ( $DownAgents.Count -gt 0 )
@@ -2526,10 +3004,10 @@ if ( $DownAgents.Count -gt 0 )
     $CompareDown = compare-object -ReferenceObject $DownAgents -DifferenceObject $UnhealthyAgents
 	# Format output of DownAgents
 	$Down = $DownAgents | ft MonitoringObjectDisplayName,TimeRaised,Name -autosize | out-string
-	$Down
+	#$Down
 	}
 
-	
+
 if ( $DownAgents.Count -eq 0 )
 	{
 	$Compare = $MM.Count + $CompareMM.Count
@@ -2539,22 +3017,22 @@ if ( $DownAgents.Count -eq 0 )
 
 # Compare Unhealthy agents
 $Unhealthy = @()
-	
+
 if ( $UnHealthyAgents.Count -eq 0 )
 	{
 	$Unhealthy += ""
 	$Unhealthy += "ZERO NOT healthy agents as of report run"
 	}
-	
+
 if ( $UnHealthyAgents.Count -gt 0 )
 	{
 	$Unhealthy += ""
 	$Unhealthy += $UnHealthyAgents | sort | out-string
 	$Unhealthy += ""
 	}
-	
-  $Test = $DownAgents.Count +   $UnHealthyAgents.Count
-  $Test
+
+$Test = $DownAgents.Count +   $UnHealthyAgents.Count
+#$Test
 
 
 #===============================================
@@ -2562,71 +3040,65 @@ if ( $UnHealthyAgents.Count -gt 0 )
 # Logical Disk free space alerts
 #===============================================
 
-$LDSTest = get-scomalert -name "Logical disk Free space is low" | ? { ( $_.NetbiosComputerName -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.NetbiosComputerName -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.NetbiosComputerName -like "[1DHSW][26CVPF]**" ) `
-	}
+$LDSTest = $MECMReportAlerts | ? { ( $_.Name -eq "Logical disk Free space is low" ) }
 
 if ( $LDSTest.Count -gt 0 )
 	{
-	$LDSTest
+	#$LDSTest
 
 	# Gather details
 	$LDSSummary = $LDSTest |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
 	# Gather Details section
 	$LDSDetails = $LDSTest | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
 
-	$LDSSummary
-	$LDSDetails
-  
-	$OpenLDSTest = $LDSTest | ? { $_.ResolutionState -ne "255" }
-	$OpenLDSTest.Count
+	#$LDSSummary
+	#$LDSDetails
+
+	$OpenLDSTest = $LDSTest
+	#$OpenLDSTest.Count
 
 	if ( $OpenLDSTest.Count -gt 0 )
 		{
 		# Summary
-		$LDSOpenSummary = $LDSTest | ? { $_.ResolutionState -ne "255" } |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
+		$LDSOpenSummary = $LDSTest |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
 		# Gather Details
-		$LDSOpenDetails = $LDSTest | ? { $_.ResolutionState -ne "255" } | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
+		$LDSOpenDetails = $LDSTest | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
 		}
-		
-	$ClosedLDSTest = $LDSTest | ? { $_.ResolutionState -eq "255" }
-	$ClosedLDSTest.Count
+
+	$ClosedLDSTest = $MECMClosedAlerts | ? { ( $_.Name -eq "Logical disk Free space is low" ) }
+	#$ClosedLDSTest.Count
 
 	if ( $ClosedLDSTest.Count -gt 0 )
 		{
 		# Summary
-		$LDSClosedSummary = $LDSTest | ? { $_.ResolutionState -eq "255" } |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
+		$LDSClosedSummary = $ClosedLDSTest |ft NetbiosComputerName,MonitoringObjectName,Parameters -autosize | out-string
 		# Gather Details section
-		$LDSClosedDetails = $LDSTest | ? { $_.ResolutionState -eq "255" } | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
+		$LDSClosedDetails = $ClosedLDSTest | fl NetbiosComputerName,MonitoringObjectName,Parameters,Description | out-string
 		}
 	}
-	
+
+
 #===============================================
 # Expiring certificates
 # Certificates about to expire/expired
 #===============================================
 
-  $Class = (get-scomclass -DisplayName "Certificate" )
-  $instance = ( $Class |Get-SCOMClassInstance )
-  $MECMPKIexpired = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
-  	# PKI certs can have Certstore, but it's not always searchable/display capable
+$Class = (get-scomclass -DisplayName "Certificate" )
+$instance = ( $Class |Get-SCOMClassInstance )
+$MECMPKIexpired = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
+	# PKI certs can have Certstore, but it's not always searchable/display capable
 	#} | ? { $_.CertStore -like "Intermediate Certification*" `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
-	
-  $MECMPKIexpired.count
+
+#$MECMPKIexpired.count
 
 $MECMPKIpersonal = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
 	} | ? { ( $_.CertStore -eq "Personal" ) `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
 
-  $MECMPKIpersonal.count
+#$MECMPKIpersonal.count
 
 # Intermediate Cert Check
 	# PKI certs can have Certstore, but it's not always searchable/display capable
@@ -2634,21 +3106,17 @@ $MECMPKIpersonal = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.He
 
 $MECMIntermediate = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
 	} | ? { $_.CertStore -like "Intermediate Certification*" `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
 	
-$MECMIntermediate.Count
+#$MECMIntermediate.Count
 
 
 $MECMRootCerts = $Instance | ? { ( $_.HealthState -ne "Success" ) -AND ( $_.HealthState -ne "Uninitialized" ) `
 	} | ? { $_.CertStore -like "Root" `
-	} | ? { ( $_.Path -like "NG[EN][BEW][AEK][02M]-SCCM*" ) `
-	-OR ( $_.Path -like "D*JJ0[1-3]S*" ) `
-	-OR ( $_.Path -like "[1DHSW][26CVPF]**" ) `
+	} | ? { ( $_.Path -like "*##MECMServerRegEX##*" ) `
 	} # | ft Path,Values -auto -wrap  # DisplayName
-$MECMRootCerts.Count
+	#$MECMRootCerts.Count
 
 
 #
@@ -2673,11 +3141,9 @@ $MECMRemaining = $MECMServerAlerts | ? { ( $_.Name -notlike "Proactive*" ) `
 	-AND ( $_.Name -eq "WSUS Synchronization Failed" ) `
 	}
 
-$MECMRemaining
+#$MECMRemaining
 
 $MECMRemaining = $MECMRemaining | ft NetbiosComputerName,TimeRaised,Name -auto -wrap
-
-
 
 
 # Build report
@@ -2691,7 +3157,7 @@ if ( $MECMServerAlerts.Count -eq 0 )
 	$MECMTeamReport += "ZERO alerts for MECM Team Daily report for ($date)"
 	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$Message")
 	}
-	
+
 if ( $MECMServerAlerts.Count -gt 0 )
 	{
 	#
@@ -2748,7 +3214,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
  	$MECMTeamReport += "# Servers NOT patched = $($ClosedNotPatched.Count)"
 	$MECMTeamReport += "#========================================================"
 	$MECMTeamReport += ""
- 
+
 	#$MECMServerAlerts = $MECMServerAlerts | ft NetbiosComputerName,TimeRaised,Name -auto -wrap
 	#$MECMServerAlerts
 
@@ -2796,7 +3262,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM Logical Disk free space alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenLDSTest.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -2819,7 +3285,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM Application alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenMECMAppAlerts.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -2828,14 +3294,14 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += $OpenMECMAppAlerts | ft NetbiosComputerName,Parameters,Name -auto | out-string
 		$MECMTeamReport += ""
 		}
-	
-	
+
+
 	if ( $OpenHighAlerts.Count -eq 0 )
 		{
 		$MECMTeamReport += "ZERO MECM Performance alerts for ($date)."
 		$MECMTeamReport += ""
 		}
-	
+
 	if ( $OpenHighAlerts.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -2844,14 +3310,14 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += $OpenHighAlerts |ft TimeRaised,NetBiosComputerName,Description -auto -wrap | out-string
 		$MECMTeamReport += ""
 		}
-		
-		
+
+
 	if ( $MECMPKIexpired.Count -eq 0 )
 		{
 		$MECMTeamReport += "ZERO MECM PKI Certificates about to expire for ($date)."
 		$MECMTeamReport += ""
 		}
-	
+
 	if ( $MECMPKIexpired.Count -gt 0 )
 		{
 		$MECMTeamReport += ""
@@ -2919,7 +3385,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM other MECM Operating System issues for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $MECMRemaining.count -gt 0 )
 		{
 		$MECMTeamReport += "# Other MECM application OR Operating System issues "
@@ -2935,7 +3401,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM 'Failed to install' application errors for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenFailedAppInstall.Count -gt 0 )
 		{
 		$FailedAppInstall = $FailedAppInstall | ft NetbiosComputerName,TimeRaised,Description -auto -wrap | out-string
@@ -2951,7 +3417,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM servers pending restart for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenPendingRestart.count -gt 0 )
 		{
 		$MECMTeamReport += "# MECM servers pending reboot for patches"
@@ -2981,7 +3447,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM servers NOT patched in past 35 days as of ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenNotPatched.count -gt 0 )
 		{
 		$MECMTeamReport += "# MECM servers not patched (at least 35 days pass before alert)"
@@ -2996,7 +3462,7 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += "ZERO MECM Action Account errors for ($date)."
 		$MECMTeamReport += ""
 		}
-		
+
 	if ( $OpenActionAccountAlerts.count -gt 0 )
 		{
 		$MECMTeamReport += "# MECM Action Account alert detail"
@@ -3007,20 +3473,20 @@ if ( $MECMServerAlerts.Count -gt 0 )
 		$MECMTeamReport += $OpenActionAccountAlerts | ft NetbiosComputerName,Parameters  -auto | out-string
 		$MECMTeamReport += "#============================================="
 		}
-	
+
 	$MECMTeamReport += ""
 	}
 
-$MECMTeamReport
+#$MECMTeamReport
 
 $MECMTeamReport = $MECMTeamReport | out-string
 
 #============================================================
 
-  $Result = "GOOD"
-  $Message = "MECM Team Daily report for ($date)"
-
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
+	$Result = "GOOD"
+	$Message = "MECM Team Daily report for ($date)"
+	$MECMTeamReport
+	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
 
 #$bag.AddValue('Result',$Result)
 $bag.AddValue('Count',$Test)
@@ -3033,19 +3499,19 @@ $bag
 
 $ReportTime = Get-Date
 $ScriptTime = ($ReportTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 
 
 #=================================================================================
 # End MAIN script section
 
-  
+
 # End of script section
 #=================================================================================
 #Log an event for script ending and total execution time.
 $EndTime = Get-Date
 $ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 #=================================================================================
 # End of script
                 </ScriptBody>
@@ -3071,7 +3537,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
           <Composite>
             <MemberModules>
               <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1025.ps1</ScriptName>
+                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1028.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alert cleanup for team daily report
@@ -3083,9 +3549,9 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
 
 # Constants section - modify stuff here:
 #=================================================================================
-# Assign script name variable for use in event logging.  
+# Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1025.ps1"
+$ScriptName = "Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1028.ps1"
 $EventID = "682"
 #=================================================================================
 
@@ -3099,7 +3565,7 @@ $whoami = whoami
 # Load MOMScript API
 $momapi = New-Object -comObject MOM.ScriptAPI
 #Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script is starting. `n Running as ($whoami).")
 #=================================================================================
 
 
@@ -3114,7 +3580,7 @@ $bag = $momapi.CreatePropertyBag()
 #=================================================================================
 #For a simple example - get files in Windows Temp:
 $date = get-date -uFormat "%Y-%m-%d"
-
+$Age = [DateTime](Get-Date).AddDays(-1)
 
 # Grab past 24 hours
 if ( (get-date).DayOfWeek -ne "Monday" )
@@ -3126,109 +3592,44 @@ if ( (get-date).DayOfWeek -eq "Monday" )
 	$Time = [DateTime](Get-Date).AddDays(-3)
 	}
 
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Cleanup MECM Alerts for date ($date).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Cleanup MECM Alerts for date ($date).")
 
 
 # Cleanup MECM alerts
 #===============================================
-# Proactive DailyTasks MECM Team Cleanup Script Alert Rule
-#
-# If Cleanup needed, array of report monitors
-#===============================================
+## Grab the MP, get the Monitors and Rules from the MP, then grab all alerts found inside the Monitors/Rules
+$SCOMCoreMP = Get-SCOMManagementPack -DisplayName "Microsoft System Center 2012 Configuration Manager Monitoring"
+$SCOMCoreRules = $SCOMCoreMP.GetRules()
+$SCOMCoreMonitors = $SCOMCoreMP.GetMonitors()
 
-$MECMReportMonitorsToClose = @()
+$SCOMCoreReportAlerts = Get-SCOMAlert -ResolutionState (0..254) | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
+$SCOMCoreReportAlerts.Count
 
-$MECMReportMonitorsToClose += "Application Deployment Alert"
-$MECMReportMonitorsToClose += "Auto-started component stopped unexpectedly"
-$MECMReportMonitorsToClose += "Average Logical Disk Seconds Per Transfer"
-$MECMReportMonitorsToClose += "Available Megabytes of Memory"
-$MECMReportMonitorsToClose += "Backup Status Monitor"
-$MECMReportMonitorsToClose += "Certificate lifespan"
-$MECMReportMonitorsToClose += "Component manager fails to access site system"
-$MECMReportMonitorsToClose += "Current Disk Queue Length (Logical Disk)"
-$MECMReportMonitorsToClose += "DHCP Client Service Health"
-$MECMReportMonitorsToClose += "Distribution manager fails to access network"
-$MECMReportMonitorsToClose += "Distribution point pool"
-$MECMReportMonitorsToClose += "DNS Client Service Health"
-$MECMReportMonitorsToClose += "Computer Not Reachable"
-$MECMReportMonitorsToClose += "Fail to execute system summary task"
-$MECMReportMonitorsToClose += "File Dispatch Manager Connection Monitor"
-$MECMReportMonitorsToClose += "File system error or corruption"
-$MECMReportMonitorsToClose += "Health Service Heartbeat Failure"
-$MECMReportMonitorsToClose += "Logical Disk Free Space Monitor"
-$MECMReportMonitorsToClose += "Max Concurrent API Monitor"
-$MECMReportMonitorsToClose += "Memory Pages Per Second"
-$MECMReportMonitorsToClose += "Percentage of Committed Memory in Use"
-$MECMReportMonitorsToClose += "Sender fails to connect to a remote site over LAN advanced security"
-$MECMReportMonitorsToClose += "Server Last Patch Applied Monitor"
-$MECMReportMonitorsToClose += "Server Pending Restart Monitor"
-$MECMReportMonitorsToClose += "Server Service Health"
-$MECMReportMonitorsToClose += "Server Uptime Monitor"
-$MECMReportMonitorsToClose += "Site component manager fails to read Active Directory objects"
-$MECMReportMonitorsToClose += "Site component manager fails to update Active Directory objects"
-$MECMReportMonitorsToClose += "Site Roles"
-$MECMReportMonitorsToClose += "Site server fails to execute a maintenance task"
-$MECMReportMonitorsToClose += "Software Update Point Availability Monitor"
-$MECMReportMonitorsToClose += "SQL Server Port Monitor"
-$MECMReportMonitorsToClose += "SQL Server Firewall Port Monitor"
-$MECMReportMonitorsToClose += "ROWS Data Free Space Left"
-$MECMReportMonitorsToClose += "DB Files Performance"
-$MECMReportMonitorsToClose += "Average Logical Disk Seconds Per Transfer"
-$MECMReportMonitorsToClose += "Memory Pages Per Second"
-$MECMReportMonitorsToClose += "Perf Threshold: Site server auth ddm inbox backlog monitor"
-$MECMReportMonitorsToClose += "WSUS Synchronization Failed"
-$MECMReportMonitorsToClose += "Perf Threshold: Site server HINV process backlog monitor"
-$MECMReportMonitorsToClose += "Perf Threshold: Management point relaymgr backlog monitor"
-$MECMReportMonitorsToClose += "Perf Threshold: Management point status backlog monitor"
-$MECMReportMonitorsToClose += "State Migration Point Availability Monitor"
-$MECMReportMonitorsToClose += "Storport Miniport Driver Timed Out Monitor"
-$MECMReportMonitorsToClose += "TCP/IP NetBIOS Service Health"
-$MECMReportMonitorsToClose += "Total CPU Utilization Percentage is too high"	
-$MECMReportMonitorsToClose += "Windows Event Log Service Health"
-$MECMReportMonitorsToClose += "Windows Firewall Service Health"
-$MECMReportMonitorsToClose += "Windows Remote Management Service Health"
-$MECMReportMonitorsToClose += "WSUS Synchronization Failed"
-	
+$SCOMCoreRuleAlerts = $SCOMCoreReportAlerts | ? { ( $_.Name -in $SCOMCoreRules.DisplayName) }
+$SCOMCoreRuleAlerts.Count
 
-# Reset open monitors	
-#
-foreach ( $MonitorDisplayName in $MECMReportMonitorsToClose )
-	{
-	$Monitors = @(Get-SCOMMonitor -displayname $MonitorDisplayName)
+$SCOMCoreMonitorAlerts = $SCOMCoreReportAlerts | ? { ($_.Name -in $SCOMCoreMonitors.DisplayName ) }
+$SCOMCoreMonitorAlerts.Count
 
-	# Set up monitor objects to reset
-	foreach ($Monitor in $Monitors)
-		{
-		$MonitorClass = Get-SCOMClass -Id $Monitor.Target.Id
-		$ActiveMonitors = Get-SCOMClassInstance -Class $MonitorClass | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) }
-		write-host "Found" + $ActiveMonitors.Count + "active monitors."
-		if ( $ActiveMonitors -ne $null)
-			{
-			foreach ($ActiveMonitor in $ActiveMonitors)
-				{
-				write-host " Resetting Health State on '" +$ActiveMonitor.FullName + "'" 
-				$ActiveMonitor.ResetMonitoringState($Monitor.ID)
-				}
-			}
-		}
-	}
-
-$ActiveMonitors.Count
+# Open/Closed breakout
+$OpenADDSAlerts = $SCOMCoreReportAlerts
+$OpenADDSAlerts.Count
+$ClosedADDSAlerts = Get-SCOMAlert -ResolutionState 255 | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
+$ClosedADDSAlerts.Count
 
 #============================================================
 
   $Result = "GOOD"
   $Message = "MECM Team Daily Cleanup for ($date)"
-  $DSMessage = "Proactive DailyTasks MECM Team Cleanup Script Task Alert Rule"
+  $DSMessage = "Proactive DailyTasks MECM Team Cleanup Script Alert Rule"
 
 
 # Build report
+#============================================================
 $MECMTeamCleanup = @()
 
-
 # Check for alerts 
-#if ( $MECMServerAlerts.Count -eq 0 )
-if ( $ActiveMonitors.Count -eq 0 )
+if ( $SCOMCoreReportAlerts.Count -eq 0 )
 	{
 	$Message = "ZERO alerts for MECM Team Daily Cleanup for ($date)"
 	$MECMTeamCleanup += "ZERO alerts for MECM Team Daily Cleanup for ($date)"
@@ -3238,11 +3639,10 @@ if ( $ActiveMonitors.Count -eq 0 )
 
 # $MECMReportMonitorsToClose or $ActiveMonitors ?
 #==================================================
-#if ( $MECMServerAlerts.Count -gt 0 )
-if ( $ActiveMonitors.Count -gt 0 )
+if ( $SCOMCoreReportAlerts.Count -gt 0 )
 	{
 	#
-	# Create table output	
+	# Create table output
 
 	#
 	# Show MECM alerts by Time Raised,NetBiosComputerName,Message
@@ -3255,7 +3655,7 @@ if ( $ActiveMonitors.Count -gt 0 )
 	$MECMTeamCleanup += "Reset $($ActiveMonitors.Count) unhealthy monitors"
 	$MECMTeamCleanup += "#"
 	}
-	
+
 $MECMTeamCleanup
 
 
@@ -3263,7 +3663,7 @@ $MECMTeamCleanup
 $momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamCleanup")
 
 #$bag.AddValue('Result',$Result)
-$bag.AddValue('Count',$Test)
+$bag.AddValue('Count',$SCOMCoreReportAlerts.Count)
 $bag.AddValue('Message',$Message)
 $bag.AddValue('Summary',$MECMTeamCleanup)
 
@@ -3273,337 +3673,112 @@ $bag
 
 $ReportTime = Get-Date
 $ScriptTime = ($ReportTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 
 
-
+# Debug Write event for rule closure
 #=================================================================================
-# End MAIN script section
+# $UnhealthyMonitors = $($UnhealthyMonitors | measure-object -sum).sum
+#$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive MECM monitors auto-closed on ($date).")
+# Write event for rule closure
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks MECM monitor reset completed for ($date)")
 
-  
-# End of script section
-#=================================================================================
-#Log an event for script ending and total execution time.
-$EndTime = Get-Date
-$ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
-#=================================================================================
-# End of script
-                </ScriptBody>
-                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
-              </WriteAction>
-            </MemberModules>
-            <Composition>
-              <Node ID="PSWA" />
-            </Composition>
-          </Composite>
-        </ModuleImplementation>
-        <OutputType>System!System.BaseData</OutputType>
-        <InputType>System!System.BaseData</InputType>
-      </WriteActionModuleType>
-      <WriteActionModuleType ID="Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA" Accessibility="Internal" Batching="false">
-        <Configuration>
-          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
-        </Configuration>
-        <OverrideableParameters>
-          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
-        </OverrideableParameters>
-        <ModuleImplementation Isolation="Any">
-          <Composite>
-            <MemberModules>
-              <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1025.ps1</ScriptName>
-                <ScriptBody>
-#=================================================================================
-#  Script to gather MECM cache cleanup alerts for team daily report
-#
-#  Author: Kevin Justin
-#  v1.0
-#=================================================================================
-
-
-# Constants section - modify stuff here:
-#=================================================================================
-# Assign script name variable for use in event logging.  
-# ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1025.ps1"
-$EventID = "681"
-#=================================================================================
-
-
-# Starting Script section - All scripts get this
-#=================================================================================
-# Gather the start time of the script
-$StartTime = Get-Date
-#Set variable to be used in logging events
-$whoami = whoami
-# Load MOMScript API
-$momapi = New-Object -comObject MOM.ScriptAPI
-#Log script event that we are starting task
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script is starting. `n Running as ($whoami).")
-#=================================================================================
-
-
-# PropertyBag Script section - Monitoring scripts get this
-#=================================================================================
-# Load SCOM PropertyBag function
-$bag = $momapi.CreatePropertyBag()
-#=================================================================================
-
-
-# Begin MAIN script section
-#=================================================================================
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Gather Proactive MECM Client Cache Cleanup Alerts for date ($date).")
-
-#For a simple example - get files in Windows Temp:
-$date = get-date -uFormat "%Y-%m-%d"
-
-
-# Grab past 24 hours
-if ( (get-date).DayOfWeek -ne "Monday" )
+$SCOMCoreRulesToClear = $SCOMCoreRuleAlerts | where { ( $_.TimeAdded -lt $Age ) }
+# Convert Age back to days for alert properties logging
+$Days = ((Get-date) - $Age).Days
+if ( $SCOMCoreRulesToClear.Count -gt 0 )
 	{
-	$Time = [DateTime](Get-Date).AddDays(-1)
+	$SCOMCoreRulesToClear | Resolve-SCOMAlert -Comment "Closing $Days day old alerts after report alert generated - MECM SCCM Addendum Automation DS"
 	}
-if ( (get-date).DayOfWeek -eq "Monday" )
+
+# Write event for rule closure
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM SCCM addendum automation rule reset completed for ($date)")
+
+
+#=================================================================================
+# Reset Monitors Script base code modified
+# Put ps1 in mgmtpacks folder
+# https://sc.scomurr.com/scom-2012-monitor-reset-cleaning-up-the-environment/
+#	Download
+# https://gallery.technet.microsoft.com/SCOM-2012-Batch-reset-63a17534
+	
+#Alternate
+#https://gallery.technet.microsoft.com/scriptcenter/Auto-reset-script-for-d8b775ca
+
+# Changed up logic to sort unique classes in mgmnt pack families.
+# Added Age variable for monitors thanks to Aris Somatis - $Age specified in top level variables
+# Cycling through monitors made reset loop huge ~650 monitors when only ~50 classes
+# New logic reduced runtime from 8 minutes to roughly 8 seconds
+#=================================================================================
+
+# Write event for rule closure
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks ADDS Monitors reset started for ($date).")
+
+
+if ( $SCOMCoreReportAlerts.Count -gt 0 )
 	{
-	$Time = [DateTime](Get-Date).AddDays(-3)
-	}
-	
+	# Get MECM SCCM classes
+		$MECMLibrary = Get-SCOMManagementPack -name "Microsoft.SystemCenter2012.ConfigurationManager.Library"
+			#get-scomclass -ManagementPack $MECMLibrary
+		$MECMMonitoring = $SCOMCoreMP
+			#get-scomclass -ManagementPack $MECMMonitoring | fl DisplayName,Name,ID
+		$MECMDiscovery = Get-SCOMManagementPack -DisplayName "Microsoft System Center 2012 Configuration Manager Discovery"
+			#get-scomclass -ManagementPack $MECMDiscovery | fl DisplayName,Name,ID
 
-# Gather MECM alerts
-# Monitors then rules
-$MECMClientCacheAlerts = get-scomalert | ? { ( $_.Name -like "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for date*" ) `
-	-OR ( $_.Name -like "Expand drive via Disk Manager on*" ) `
-	}  | ? { ( $_.TimeRaised -ge $Time ) }
-
-
-#$MECMReportAlerts
-$MECMClientCacheAlerts.Count
-
-# Open MECM server alerts
-$MECMOpenAlerts = $MECMClientCacheAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
-$MECMOpenAlerts.Count
-
-# Closed MECM server alerts
-$MECMClosedAlerts = $MECMClientCacheAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$MECMClosedAlerts.Count
-
-
-# Client Cache cleanup alerts
-$MECMCacheCleanupAlerts = $MECMClientCacheAlerts | ? { ( $_.Name -like "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for date*" ) }
-$MECMCacheCleanupAlerts.Count
-
-# Open alerts
-$OpenMECMCacheCleanupAlerts = $MECMCacheCleanupAlerts | ? { ( $_.ResolutionState -ne "255" ) }
-$OpenMECMCacheCleanupAlerts.Count
-
-# Closed alerts
-$ClosedMECMCacheCleanupAlerts = $MECMCacheCleanupAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$ClosedMECMCacheCleanupAlerts.Count
-
-
-# Expand drives via disk manager server alerts
-$MECMExpandDriveAlerts = $MECMClientCacheAlerts | ? { ( $_.Name -like "Expand drive via Disk Manager on*" ) }
-$MECMExpandDriveAlerts.Count
-
-# Open MECM server alerts
-$OpenMECMExpandDriveAlerts = $MECMExpandDriveAlerts	| ? { ( $_.ResolutionState -ne "255" ) }
-$OpenMECMExpandDriveAlerts.Count
-
-# Closed MECM server alerts
-$ClosedMECMExpandDriveAlerts = $MECMExpandDriveAlerts | ? { ( $_.ResolutionState -eq "255" ) }
-$ClosedMECMExpandDriveAlerts.Count
-
-
-# Build report
-$MECMTeamReport = @()
-
-
-# Check for alerts 
-if ( $MECMClientCacheAlerts.Count -eq 0 )
-	{
-	$Message = "ZERO alerts for Proactive MECM Client Cache Cleanup Alerts for ($date)"
-	$MECMTeamReport += "ZERO alerts for Proactive MECM Client Cache Cleanup Alerts for ($date)"
-	$momapi.LogScriptEvent($ScriptName,$EventID,0,"$Message")
-	}
-	
-if ( $MECMClientCacheAlerts.Count -gt 0 )
-	{
-	#
-	# Create table output	
-
-	#
-	# Show MECM alerts by Time Raised,NetBiosComputerName,Message
-	#
-	$MECMTeamReport += ""
-	$MECMTeamReport += "# Proactive MECM Client Cache Cleanup Alerts for $($date)"
-	$MECMTeamReport += "#"
-	$MECMTeamReport += "#"
-	$MECMTeamReport += "# NEW Alerts since last run = $($MECMClientCacheAlerts.Count)"
-	$MECMTeamReport += ""
-	$MECMTeamReport += "#========================================================"
-	$MECMTeamReport += "# Open MECM Client Cache alerts = $($OpenMECMCacheCleanupAlerts.Count)"
-	$MECMTeamReport += "# Open MECM Client Cache alerts = $($OpenMECMExpandDriveAlerts.Count)"
-	$MECMTeamReport += "#========================================================"
-	$MECMTeamReport += ""
-	$MECMTeamReport += ""
-	$MECMTeamReport += "#========================================================"
-	$MECMTeamReport += "# CLOSED MECM Client Cache alerts = $($ClosedMECMCacheCleanupAlerts.Count)"
-	$MECMTeamReport += "# CLOSED MECM Expand Drive alerts = $($ClosedMECMExpandDriveAlerts.Count)"
-	$MECMTeamReport += "#========================================================"
-	$MECMTeamReport += ""
-
-
-	# Add logic for alert detail
-
-	$MECMTeamReport += ""
-	$MECMTeamReport += "# OPEN Alert details"
-	$MECMTeamReport += "#==============================="
-	$MECMTeamReport += ""
-	
-	
- 	if ( $OpenMECMCacheCleanupAlerts.Count -eq 0 )
-		{
-		$MECMTeamReport += "ZERO Open MECM Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for ($date)."
-		$MECMTeamReport += ""
-		}
-		
-	if ( $OpenMECMCacheCleanupAlerts.Count -gt 0 )
-		{
-		$MECMTeamReport += "#"
-		$MECMTeamReport += "# Open MECM SCCM ConfigMgr Client Cache Cleanup Alert details"
-		$MECMTeamReport += "#=============================="
-		$MECMTeamReport += $OpenMECMCacheCleanupAlerts | out-string
-		$MECMTeamReport += "#============================================================"
-		$MECMTeamReport += ""
-		}
-
-
- 	if ( $OpenMECMExpandDriveAlerts.Count -eq 0 )
-		{
-		$MECMTeamReport += "ZERO Open MECM Proactive Expand drive via Disk Manager Alerts for ($date)."
-		$MECMTeamReport += ""
-		}
-		
-	if ( $OpenMECMExpandDriveAlerts.Count -gt 0 )
-		{
-		$MECMTeamReport += "#"
-		$MECMTeamReport += "# Open Expand drive via Disk Manager Alert details"
-		$MECMTeamReport += "#=============================="
-		$MECMTeamReport += $OpenMECMExpandDriveAlerts | out-string
-		$MECMTeamReport += "#============================================================"
-		$MECMTeamReport += ""
-		}
-
-	$MECMTeamReport += ""
-	$MECMTeamReport += "# CLOSED Alert details"
-	$MECMTeamReport += "#==============================="
-	$MECMTeamReport += ""
-	
- 	if ( $ClosedMECMCacheCleanupAlerts.Count -eq 0 )
-		{
-		$MECMTeamReport += "ZERO Closed MECM Proactive MECM SCCM ConfigMgr Client Cache Cleanup Alerts for ($date)."
-		$MECMTeamReport += ""
-		}
-		
-	if ( $ClosedMECMCacheCleanupAlerts.Count -gt 0 )
-		{
-		$MECMTeamReport += "#"
-		$MECMTeamReport += "# Closed MECM SCCM ConfigMgr Client Cache Cleanup Alert details"
-		$MECMTeamReport += "#=============================="
-		$MECMTeamReport += $ClosedMECMCacheCleanupAlerts | out-string
-		$MECMTeamReport += "#============================================================"
-		$MECMTeamReport += ""
-		}
-
-
- 	if ( $ClosedMECMExpandDriveAlerts.Count -eq 0 )
-		{
-		$MECMTeamReport += "ZERO Closed MECM Proactive Expand drive via Disk Manager Alerts for ($date)."
-		$MECMTeamReport += ""
-		}
-		
-	if ( $OpenMECMExpandDriveAlerts.Count -gt 0 )
-		{
-		$MECMTeamReport += "#"
-		$MECMTeamReport += "# Closed Expand drive via Disk Manager Alert details"
-		$MECMTeamReport += "#=============================="
-		$MECMTeamReport += $ClosedMECMExpandDriveAlerts | out-string
-		$MECMTeamReport += "#============================================================"
-		$MECMTeamReport += ""
-		}
-	}
-	
-
-$MECMTeamReport
-
-$MECMTeamReport = $MECMTeamReport | out-string
-
-#============================================================
-
-  $Result = "GOOD"
-  $Message = "Proactive MECM Client Cache Cleanup Alerts task for ($date)"
-
-  $momapi.LogScriptEvent($ScriptName,$EventID,0,"$MECMTeamReport")
-
-#$bag.AddValue('Result',$Result)
-$bag.AddValue('Count',$Test)
-$bag.AddValue('Message',$Message)
-$bag.AddValue('Summary',$MECMTeamReport)
-
-
-# Return all bags
-$bag
-
-$ReportTime = Get-Date
-$ScriptTime = ($ReportTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
-
-
-#
-# If Cleanup needed, array of report monitors
-
-$MECMReportMonitorsToClose = @()
-
-$MECMReportMonitorsToClose += "Proactive MECM SCCM ConfigMgr Client Cache Cleanup Monitor"
-	
-
-# Reset open monitors	
-if ( $MECMOpenAlerts.Count -gt 0 )
-{
-foreach ( $MonitorDisplayName in $MECMReportMonitorsToClose )
-	{
-	$Monitors = @(Get-SCOMMonitor -displayname $MonitorDisplayName)
+	# MECM pack naming
+	$MECMClasses = @(Get-SCOMClass -ManagementPack $MECMLibrary; Get-SCOMClass -ManagementPack $MECMDiscovery; )
+	$MECMClass = $MECMClasses | sort -property Name -uniq
+	# Debug
+	$MECMClass.Count
 
 	# Set up monitor objects to reset
-	foreach ($Monitor in $Monitors)
+	foreach ($Class in $MECMClass)
 		{
-		$MonitorClass = Get-SCOMClass -Id $Monitor.Target.Id
-		$ActiveMonitors = Get-SCOMClassInstance -Class $MonitorClass | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) }
-		write-host "Found" + $ActiveMonitors.Count + "active monitors."
-		if ( $ActiveMonitors -ne $null)
+		$ActiveMonitors = @(Get-SCOMClassInstance -Class $Class | ? { ($_.healthstate -ne 'Success') -AND ( $_.healthstate -ne 'Uninitialized') -AND ($_.IsAvailable -eq $true) } )
+		# Debug
+		$ActiveMonitors.Count
+		# $ActiveMonitors | fl -property *
+		write-host "Found" $ActiveMonitors.Count "unhealthy monitors for class" $Class
+		foreach ( $UnhealthyOLDMonitor in $ActiveMonitors )
 			{
-			foreach ($ActiveMonitor in $ActiveMonitors)
+			#if ( $UnhealthyOLDMonitor.AvailabilityLastModified -lt $Age )
+			if ( $UnhealthyOLDMonitor.StateLastModified -lt $Age )
 				{
-				write-host " Resetting Health State on '" +$ActiveMonitor.FullName + "'" 
-				$ActiveMonitor.ResetMonitoringState($Monitor.ID)
+				#$UnhealthyMonitors += $ActiveMonitors.Count
+				#UnhealthyOLDMonitor | select AvailabilityLastModified,Path,DisplayName
+				#$UnhealthyOLDMonitor.Count
+				#write-host "Found" + $UnhealthyOLDMonitor.Count + "unhealthy monitor beyond" $Age "days."
+				#write-host ""
+				if ( $ActiveMonitors.Count -gt 0)
+					{
+					foreach ( $ActiveMonitor in $UnhealthyOLDMonitor )
+						{
+						# Debug
+						$ActiveMonitor.ID
+						write-host " Resetting Health State on '" + $ActiveMonitor.FullName + "'" 
+						write-host ""
+						$ActiveMonitor.ResetMonitoringState($ActiveMonitor)
+						}
+					}
 				}
 			}
 		}
+	# Debug
+	#$MonitorClass | fl -property *
+	#$MonitorClass | select DisplayName,ID
 	}
-}
 
 
 #=================================================================================
 # End MAIN script section
 
-  
+
 # End of script section
 #=================================================================================
 #Log an event for script ending and total execution time.
 $EndTime = Get-Date
 $ScriptTime = ($EndTime - $StartTime).TotalSeconds
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runtime: ($ScriptTime) seconds.")
 #=================================================================================
 # End of script
                 </ScriptBody>
@@ -4586,6 +4761,8 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"`n Script Completed. `n Script Ru
         <DisplayString ElementID="Microsoft.System.Center.Configuration.Manager.Monitoring.Addendum">
           <Name>Microsoft System Center 2012 forward Configuration Manager Monitoring Addendum</Name>
           <Description>
+v1.0.2.8  27 Dec 2023 Whitespace audit, ResolutionState changes, performance changes to DS/WA
+v1.0.2.6  30 Nov 2023 Removed debug detail from DS/WA which showed in Health Explorer pane
 v1.0.2.5  18 Jul 2023 Updated reports to informational
 v1.0.2.4  27 Jun 2023 Reports to Warning, GMT setting, Override sync
 v1.0.2.3   8 Jun 2022 Updated Reports, group regex, ClientCacheCleanup Monitor and Datasource
