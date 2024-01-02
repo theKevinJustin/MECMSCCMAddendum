@@ -2,7 +2,7 @@
   <Manifest>
     <Identity>
       <ID>Microsoft.System.Center.Configuration.Manager.Monitoring.Addendum</ID>
-      <Version>1.0.2.8</Version>
+      <Version>1.0.2.9</Version>
     </Identity>
     <Name>Microsoft System Center 2012 Configuration Manager Monitoring Addendum</Name>
     <References>
@@ -115,7 +115,7 @@
 				</Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  SCCM MECM Client cache cleanup and C: drive cleanup
@@ -138,7 +138,7 @@ $ComputerName = $env:ComputerName
 # Constants section - modify stuff here:
 #=================================================================================
 # Assign script name variable for use in event logging.
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1028.ps1"
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1029.ps1"
 $EventID = "680"
 #=================================================================================
 
@@ -417,7 +417,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
                 </Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM cache cleanup alerts for team daily report
@@ -431,7 +431,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
 #=================================================================================
 # Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1028.ps1"
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.Datasource.v1029.ps1"
 $EventID = "681"
 #=================================================================================
 
@@ -767,7 +767,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
                 </Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alerts for team daily report
@@ -781,7 +781,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
 #=================================================================================
 # Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1028.ps1"
+$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1029.ps1"
 $EventID = "681"
 #=================================================================================
 
@@ -1718,7 +1718,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
                 </Scheduler>
               </DataSource>
               <ProbeAction ID="PA" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alerts for team daily alert cleanup
@@ -1732,7 +1732,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
 #=================================================================================
 # Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1028.ps1"
+$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Cleanup.Datasource.v1029.ps1"
 $EventID = "681"
 #=================================================================================
 
@@ -1793,10 +1793,10 @@ $SCOMCoreMonitorAlerts = $SCOMCoreReportAlerts | ? { ($_.Name -in $SCOMCoreMonit
 $SCOMCoreMonitorAlerts.Count
 
 # Open/Closed breakout
-$OpenADDSAlerts = $SCOMCoreReportAlerts
-$OpenADDSAlerts.Count
-$ClosedADDSAlerts = Get-SCOMAlert -ResolutionState 255 | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
-$ClosedADDSAlerts.Count
+$OpenMECMAlerts = $SCOMCoreReportAlerts
+$OpenMECMAlerts.Count
+$ClosedMECMAlerts = Get-SCOMAlert -ResolutionState 255 | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
+$ClosedMECMAlerts.Count
 
 #============================================================
 
@@ -1893,7 +1893,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM SCCM addendum automation rul
 #=================================================================================
 
 # Write event for rule closure
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks ADDS Monitors reset started for ($date).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks MECM Monitors reset started for ($date).")
 
 
 if ( $SCOMCoreReportAlerts.Count -gt 0 )
@@ -1987,7 +1987,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
           <Composite>
             <MemberModules>
               <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.WA.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.WA.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  SCCM MECM Client cache cleanup and C: drive cleanup
@@ -2008,7 +2008,7 @@ param([string]$DriveLetter,[string]$ComputerName)
 # Constants section - modify stuff here:
 #=================================================================================
 # Assign script name variable for use in event logging.
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1028.ps1"
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Monitor.Datasource.v1029.ps1"
 $EventID = "680"
 #=================================================================================
 
@@ -2266,7 +2266,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
           <Composite>
             <MemberModules>
               <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM cache cleanup alerts for team daily report
@@ -2280,7 +2280,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
 #=================================================================================
 # Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1028.ps1"
+$ScriptName = "Proactive.MECM.SCCM.ConfigMgr.Client.Cache.Cleanup.Reports.WA.v1029.ps1"
 $EventID = "681"
 #=================================================================================
 
@@ -2601,7 +2601,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
           <Composite>
             <MemberModules>
               <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Reports.WA.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Reports.WA.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alerts for team daily report
@@ -2615,7 +2615,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
 #=================================================================================
 # Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1028.ps1"
+$ScriptName = "Proactive.MECM.SCCM.Configuration.Manager.Reports.Datasource.v1029.ps1"
 $EventID = "682"
 #=================================================================================
 
@@ -3537,7 +3537,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
           <Composite>
             <MemberModules>
               <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
-                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1028.ps1</ScriptName>
+                <ScriptName>Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1029.ps1</ScriptName>
                 <ScriptBody>
 #=================================================================================
 #  Script to gather MECM alert cleanup for team daily report
@@ -3551,7 +3551,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
 #=================================================================================
 # Assign script name variable for use in event logging.
 # ScriptName should be the same as the ID of the module that the script is contained in
-$ScriptName = "Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1028.ps1"
+$ScriptName = "Proactive.Microsoft.SystemCenter.Configuration.Manager.Cleanup.WA.v1029.ps1"
 $EventID = "682"
 #=================================================================================
 
@@ -3612,10 +3612,10 @@ $SCOMCoreMonitorAlerts = $SCOMCoreReportAlerts | ? { ($_.Name -in $SCOMCoreMonit
 $SCOMCoreMonitorAlerts.Count
 
 # Open/Closed breakout
-$OpenADDSAlerts = $SCOMCoreReportAlerts
-$OpenADDSAlerts.Count
-$ClosedADDSAlerts = Get-SCOMAlert -ResolutionState 255 | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
-$ClosedADDSAlerts.Count
+$OpenMECMAlerts = $SCOMCoreReportAlerts
+$OpenMECMAlerts.Count
+$ClosedMECMAlerts = Get-SCOMAlert -ResolutionState 255 | ? { ($_.Name -in $SCOMCoreRules.DisplayName) -or ($_.Name -in $SCOMCoreMonitors.DisplayName) }
+$ClosedMECMAlerts.Count
 
 #============================================================
 
@@ -3712,7 +3712,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"MECM SCCM addendum automation rul
 #=================================================================================
 
 # Write event for rule closure
-$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks ADDS Monitors reset started for ($date).")
+$momapi.LogScriptEvent($ScriptName,$EventID,0,"Proactive DailyTasks MECM Monitors reset started for ($date).")
 
 
 if ( $SCOMCoreReportAlerts.Count -gt 0 )
@@ -4761,6 +4761,7 @@ $momapi.LogScriptEvent($ScriptName,$EventID,0,"Script Completed. `n Script Runti
         <DisplayString ElementID="Microsoft.System.Center.Configuration.Manager.Monitoring.Addendum">
           <Name>Microsoft System Center 2012 forward Configuration Manager Monitoring Addendum</Name>
           <Description>
+v1.0.2.9   4 Jan 2024 Resolution State logic improvements for large environments
 v1.0.2.8  27 Dec 2023 Whitespace audit, ResolutionState changes, performance changes to DS/WA
 v1.0.2.6  30 Nov 2023 Removed debug detail from DS/WA which showed in Health Explorer pane
 v1.0.2.5  18 Jul 2023 Updated reports to informational
