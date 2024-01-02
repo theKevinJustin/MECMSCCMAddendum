@@ -1,5 +1,5 @@
 # MECMSCCMAddendum
-Microsoft System Center 2012 Configuration Manager Monitoring Addendum 1.0.2.8
+Microsoft System Center 2012 Configuration Manager Monitoring Addendum v1.0.2.9
 
 Download [here](https://github.com/theKevinJustin/MECMSCCMAddendum/blob/main/Microsoft.System.Center.Configuration.Manager.Monitoring.Addendum.xml)
 
@@ -10,6 +10,7 @@ Blog [https://kevinjustin.com/blog/2023/08/30/mecm-sccm-addendum-pack/](https://
 
 # Version History:
 ```
+v1.0.2.9   4 Jan 2024 Resolution State logic improvements for large environments
 v1.0.2.8  27 Dec 2023 Whitespace audit, ResolutionState changes, performance changes to DS/WA
 v1.0.2.6  30 Nov 2023 Removed debug detail from DS/WA which showed in Health Explorer pane
 v1.0.2.5  18 Jul 2023 Updated reports to informational
